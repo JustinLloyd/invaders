@@ -1,0 +1,12 @@
+{
+  "name": "invaders",
+  "version": "1.0.0",
+  "dependencies": {
+    "@types/jquery": "^3.5.0"
+  },
+  "devDependencies": {
+    "html-webpack-inline-source-plugin": "0.0.10",
+    "html-webpack-plugin": "^5.3.2",
+    "webpack": "^5.45.1"
+  }
+}

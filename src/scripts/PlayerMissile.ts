@@ -1,0 +1,5 @@
+class PlayerMissile extends GameObject
+{
+
+}
+

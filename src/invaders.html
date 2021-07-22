@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js" integrity="sha512-UxP+UhJaGRWuMG2YC6LPWYpFQnsSgnor0VUF3BHdD83PS/pOpN+FYbZmrYN+ISX8jnvgVUciqP/fILOXDjZSwg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script type="text/javascript" src="../build/GameWorld.js"></script>
+	<script type="text/javascript" src="../build/GameObject.js"></script>
+	<script type="text/javascript" src="../build/Scoreboard.js"></script>
+	<script type="text/javascript" src="../build/Player.js"></script>
+	<title>invaders</title>
+	<style>
+		.segment
+		{
+			position: absolute;
+		}
+		.segment00
+		{
+			left: 4px;
+			top: 0;
+		}
+		.segment01
+		{
+			left: 24px; top: 4px
+		}
+		.alien-02
+		{
+			fill:none;
+			stroke:#00adee;
+			stroke-miterlimit:10;
+			stroke-width:0.25px;
+		}
+
+		.segment
+		{
+			width: 100px;
+			height: auto;
+		}
+		.digit
+		{
+
+		}
+		.digit01
+		{
+
+		}
+		.digit02
+		{
+
+		}
+		.digit03
+		{
+
+		}
+		#scoreboard
+		{
+			width: 400px;
+			height: 100px;
+			border-style: solid;
+			border-width: 1px;
+		}
+		#playfield
+		{
+			width: 400px;
+			height: 600px;
+			border-style: solid;
+			border-width: 1px;
+		}
+		#livesindicator
+		{
+			width: 400px;
+			height: 100px;
+			border-style: solid;
+			border-width: 1px;
+		}
+
+	</style>
+</head>
+<body>
+<div id="scoreboard">
+</div>
+<div id="playfield">
+<!--
+	<svg id="alien" xmlns="http://www.w3.org/2000/svg" width="65.86" height="51.56" viewBox="0 0 65.86 51.56" class="alien-02" style="position: absolute; left: 200px; top: 200px">
+		<g>
+			<path d="M17.14,30.21a23.64,23.64,0,0,1-6.45-5.64A10,10,0,0,1,13.91,22l1-2.15a3.2,3.2,0,0,1,1.45,2.9c.42,1.71,1.81,3.07,3.54,4.3C18.32,27.7,17.17,28.59,17.14,30.21Z"/>
+			<path d="M48.73,30.21a23.64,23.64,0,0,0,6.45-5.64A10,10,0,0,0,52,22l-1-2.15a3.2,3.2,0,0,0-1.45,2.9c-.41,1.71-1.81,3.07-3.54,4.3C47.54,27.7,48.69,28.59,48.73,30.21Z"/>
+			<path d="M1.05,22.13a46.27,46.27,0,0,0,12.77-6.56,8.45,8.45,0,0,0-2.55-4.18l-3,.64A2.4,2.4,0,0,0,7.2,14.18l-5.15-.76A20.9,20.9,0,0,1,7.2,1.85C10.25-.42,14.66.79,18.92,1.08c.69,4.75-6.74,6.48-3.37,9.93C19.5,10.16,23.93,5.33,25,2.1h4.41c0,2.73,1.18,4.6,3.54,5.51,2.36-.91,3.51-2.78,3.55-5.51h4.41c1,3.23,5.48,8.06,9.42,8.91,3.38-3.45-4.06-5.18-3.37-9.93,4.27-.29,8.67-1.5,11.73.77a20.9,20.9,0,0,1,5.15,11.57l-5.16.76A2.37,2.37,0,0,0,57.56,12l-3-.64A8.48,8.48,0,0,0,52,15.57a46.18,46.18,0,0,0,12.78,6.56c.61,1.77.84,3.42,0,4.71L61.45,24.4c1.69,2.53,3.29,5,3.37,7-2.35,1.53-4.4,3.86-5.69,8.25L52.5,39.5l-.34,2.26,5.17,1.45c-3.85,2-7.5,4.16-9,7.26C47,48,44.39,47,41,47.05a20.21,20.21,0,0,1,5.16-6,6.36,6.36,0,0,0-3.65-3.89c.2-6.39.17-12.37-.88-16.56H24.22c-1,4.19-1.08,10.17-.87,16.56a2.87,2.87,0,0,1,2.09,3.51c-2.54,1.15-5.69,2-3.3,5.7-3.38,0-3.23,1.66-4.6,4.14-1.51-3.1-5.16-5.22-9-7.26l5.17-1.45-.35-2.26-6.62.17C5.44,35.28,3.39,33,1.05,31.42c.07-2,1.68-4.49,3.37-7L1.05,26.84C.21,25.55.44,23.9,1.05,22.13Z"/>
+		</g>
+	</svg>
+-->
+</div>
+<div id="livesindicator">
+</div>
+<canvas id="canvas1" style="position: absolute; top: 0px; left: 0px; width: 400px; height: 600px;"></canvas>
+<script>
+
+
+
+	"use strict";
+	var img_alien02 = new Image();
+	img_alien02.src = 'data:image/svg+xml,\
+	<svg xmlns="http://www.w3.org/2000/svg" width="65.86" height="51.56" viewBox="0 0 65.86 51.56"><g class="alien-02"><path class="alien-02" d="M17.14,30.21a23.64,23.64,0,0,1-6.45-5.64A10,10,0,0,1,13.91,22l1-2.15a3.2,3.2,0,0,1,1.45,2.9c.42,1.71,1.81,3.07,3.54,4.3C18.32,27.7,17.17,28.59,17.14,30.21Z"/><path class="alien-02" d="M48.73,30.21a23.64,23.64,0,0,0,6.45-5.64A10,10,0,0,0,52,22l-1-2.15a3.2,3.2,0,0,0-1.45,2.9c-.41,1.71-1.81,3.07-3.54,4.3C47.54,27.7,48.69,28.59,48.73,30.21Z"/><path class="alien-02" d="M1.05,22.13a46.27,46.27,0,0,0,12.77-6.56,8.45,8.45,0,0,0-2.55-4.18l-3,.64A2.4,2.4,0,0,0,7.2,14.18l-5.15-.76A20.9,20.9,0,0,1,7.2,1.85C10.25-.42,14.66.79,18.92,1.08c.69,4.75-6.74,6.48-3.37,9.93C19.5,10.16,23.93,5.33,25,2.1h4.41c0,2.73,1.18,4.6,3.54,5.51,2.36-.91,3.51-2.78,3.55-5.51h4.41c1,3.23,5.48,8.06,9.42,8.91,3.38-3.45-4.06-5.18-3.37-9.93,4.27-.29,8.67-1.5,11.73.77a20.9,20.9,0,0,1,5.15,11.57l-5.16.76A2.37,2.37,0,0,0,57.56,12l-3-.64A8.48,8.48,0,0,0,52,15.57a46.18,46.18,0,0,0,12.78,6.56c.61,1.77.84,3.42,0,4.71L61.45,24.4c1.69,2.53,3.29,5,3.37,7-2.35,1.53-4.4,3.86-5.69,8.25L52.5,39.5l-.34,2.26,5.17,1.45c-3.85,2-7.5,4.16-9,7.26C47,48,44.39,47,41,47.05a20.21,20.21,0,0,1,5.16-6,6.36,6.36,0,0,0-3.65-3.89c.2-6.39.17-12.37-.88-16.56H24.22c-1,4.19-1.08,10.17-.87,16.56a2.87,2.87,0,0,1,2.09,3.51c-2.54,1.15-5.69,2-3.3,5.7-3.38,0-3.23,1.66-4.6,4.14-1.51-3.1-5.16-5.22-9-7.26l5.17-1.45-.35-2.26-6.62.17C5.44,35.28,3.39,33,1.05,31.42c.07-2,1.68-4.49,3.37-7L1.05,26.84C.21,25.55.44,23.9,1.05,22.13Z"/></g></svg>';
+
+	$(function() {
+		var gameWorld = new GameWorld('#canvas1');
+
+		var ratio   = window.devicePixelRatio || 1;
+	});
+
+</script>
+</body>
+</html>

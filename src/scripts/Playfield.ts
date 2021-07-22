@@ -1,0 +1,4 @@
+class Playfield extends GameObject
+{
+
+}
