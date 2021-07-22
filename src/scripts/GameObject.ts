@@ -1,4 +1,4 @@
-class GameObject
+export class GameObject
 {
     public x: number;
     public y: number;

@@ -1,51 +1,14 @@
+import {Invader} from "./Invader";
+import {DifficultySetting} from "./DifficultySetting";
+import {GameObject} from "./GameObject";
+import {InvaderMissile} from "./InvaderMissile";
+import {PlayerMissile} from "./PlayerMissile";
+import {MissileBase} from "./MissileBase";
+import {BonusSpaceship} from "./BonusSpaceship";
+import {Scoreboard} from "./Scoreboard";
+import {LivesIndicator} from "./LivesIndicator";
+
 const MAX_PLAYER_MISSILES = 2 ;
-
-class DifficultyData
-{
-    public readonly invaders:number;
-    public readonly invaderMissiles:number;
-    public readonly invaderDescentSpeed:number;
-    public readonly bonusSpaceshipMovementSpeed:number;
-    public readonly invaderLowestStartingRow:number;
-}
-
-class DifficultySetting extends GameObject
-{
-    private _currentDifficulty:number;
-    private difficultyData:ReadonlyArray<DifficultyData> =
-    [
-        {invaders:2,bonusSpaceshipMovementSpeed:1, invaderDescentSpeed:1, invaderMissiles:2,invaderLowestStartingRow:1},
-        {invaders:2,bonusSpaceshipMovementSpeed:1, invaderDescentSpeed:1, invaderMissiles:3,invaderLowestStartingRow:2},
-        {invaders:3,bonusSpaceshipMovementSpeed:1, invaderDescentSpeed:1, invaderMissiles:3,invaderLowestStartingRow:3},
-    ];
-    constructor()
-    {
-
-        super();
-        this._currentDifficulty = 0;
-    }
-
-    get currentDifficulty(): number
-    {
-        return this._currentDifficulty;
-    }
-
-    set currentDifficulty(value: number)
-    {
-        value = Math.min(2, Math.max(0, value));
-        this._currentDifficulty = value;
-    }
-
-    get invaderMissiles():number
-    {
-        return this.difficultyData[this._currentDifficulty].invaderMissiles;
-    }
-
-    get invaders():number
-    {
-        return this.difficultyData[this._currentDifficulty].invaders;
-    }
-}
 
 class GameWorld
 {
@@ -59,6 +22,8 @@ class GameWorld
     invaders: Array<Invader>;
     bonusSpaceship: BonusSpaceship;
     difficulty:DifficultySetting;
+    scoreboard:Scoreboard;
+    livesIndicator:LivesIndicator;
 
     constructor(canvasId)
     {
@@ -80,6 +45,9 @@ class GameWorld
 
     createWorld() {
         $("#playfield").append($("#alien")[0]);
+        this.scoreboard = new Scoreboard();
+        this.gameObjects.push(this.scoreboard);
+
         this.gameObjects =
             [
                 new Scoreboard(),

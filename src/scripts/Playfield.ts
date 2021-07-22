@@ -1,4 +1,6 @@
-class Playfield extends GameObject
+import {GameObject} from "./GameObject";
+
+export class Playfield extends GameObject
 {
 
 }

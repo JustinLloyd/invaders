@@ -1,9 +1,11 @@
+import {GameObject} from "./GameObject";
+
 const INVADER_COL_STEP = 100;
 const INVADER_ROW_STEP = 100;
 const INVADER_COL_OFFSET = 10;
 const INVADER_ROW_OFFSET = 0;
 
-class Invader extends GameObject
+export class Invader extends GameObject
 {
     row: number;
     col: number;

@@ -1,8 +1,10 @@
+import {GameObject} from "./GameObject";
+
 const MISSILE_BASE_COL_OFFSET = 10;
 const MISSILE_BASE_COL_STEP = 100;
 const MISSILE_BASE_Y = 800;
 
-class MissileBase extends GameObject
+export class MissileBase extends GameObject
 {
     public col: number;
 

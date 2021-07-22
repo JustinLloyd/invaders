@@ -1,9 +1,11 @@
-class Scoreboard extends GameObject
+import {GameObject} from "./GameObject";
+
+export class Scoreboard extends GameObject
 {
     score: number;
     constructor()
     {
-        super(0,0);
+        super();
         this.score = 0;
     }
 }
