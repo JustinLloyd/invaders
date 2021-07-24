@@ -3,9 +3,10 @@ import {GameObject} from "./GameObject";
 export class Scoreboard extends GameObject
 {
     score: number;
-    constructor()
+    private digitSegments:Array<string>;
+
+    init()
     {
-        super();
         this.score = 0;
     }
 }

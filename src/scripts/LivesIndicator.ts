@@ -3,8 +3,7 @@ import {GameObject} from "./GameObject";
 export class LivesIndicator extends GameObject
 {
     lives: number;
-    constructor() {
-        super();
+    init() {
         this.lives = 3;
 
     }

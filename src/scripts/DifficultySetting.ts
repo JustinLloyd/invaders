@@ -10,21 +10,30 @@ export class DifficultySetting extends GameObject {
                 bonusSpaceshipMovementSpeed: 1,
                 invaderDescentSpeed: 1,
                 invaderMissiles: 2,
-                invaderLowestStartingRow: 1
+                invaderLowestStartingRow: 1,
+                playerMissiles:2,
+                playerMissileSpeed:1,
+                playerMovementSpeed:1,
             },
             {
                 invaders: 2,
                 bonusSpaceshipMovementSpeed: 1,
                 invaderDescentSpeed: 1,
                 invaderMissiles: 3,
-                invaderLowestStartingRow: 2
+                invaderLowestStartingRow: 2,
+                playerMissiles:2,
+                playerMissileSpeed:1,
+                playerMovementSpeed:1,
             },
             {
                 invaders: 3,
                 bonusSpaceshipMovementSpeed: 1,
                 invaderDescentSpeed: 1,
                 invaderMissiles: 3,
-                invaderLowestStartingRow: 3
+                invaderLowestStartingRow: 3,
+                playerMissiles:2,
+                playerMissileSpeed:1,
+                playerMovementSpeed:1,
             },
         ];
 
@@ -49,5 +58,9 @@ export class DifficultySetting extends GameObject {
 
     get invaders(): number {
         return this.difficultyData[this._currentDifficulty].invaders;
+    }
+
+    get playerMissiles():number{
+        return this.difficultyData[this._currentDifficulty].playerMissiles;
     }
 }
