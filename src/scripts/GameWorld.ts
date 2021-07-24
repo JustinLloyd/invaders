@@ -1,12 +1,4 @@
 import {GameObject} from "./GameObject";
-import {Invader} from "./Invader";
-import {DifficultySetting} from "./DifficultySetting";
-import {InvaderMissile} from "./InvaderMissile";
-import {PlayerMissile} from "./PlayerMissile";
-import {MissileBase} from "./MissileBase";
-import {BonusSpaceship} from "./BonusSpaceship";
-import {Scoreboard} from "./Scoreboard";
-import {LivesIndicator} from "./LivesIndicator";
 
 export class GameWorld
 {
