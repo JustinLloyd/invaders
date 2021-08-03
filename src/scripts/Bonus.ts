@@ -1,8 +1,6 @@
-import * as PIXI from "pixi.js";
-import {Sprite, Container, utils} from "pixi.js";
+import {Sprite, utils} from "pixi.js";
 import {PlayfieldGameObject} from "./PlayfieldGameObject";
 import {GameObject} from "./GameObject";
-import GameWorld from "./GameWorld";
 import * as CONSTANTS from "./Constants";
 import {COLLISION_BONUS, COLLISION_MISSILE, LEFT_COLUMN, RIGHT_COLUMN, TEXTURE_BONUS_01, TEXTURE_BONUS_02, TEXTURE_BONUS_HIT_01, TEXTURE_BONUS_HIT_02} from "./Constants";
 import {DifficultySetting} from "./DifficultySetting";
@@ -21,11 +19,6 @@ enum MovementDirection
 {
     LeftToRight,
     RightToLeft
-}
-
-export class Random
-{
-    protected _rng:RandomGenerator;
 }
 
 export class Bonus extends PlayfieldGameObject
