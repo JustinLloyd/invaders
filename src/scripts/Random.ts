@@ -2,17 +2,17 @@ import {Validation} from "./Validation";
 
 export class Random
 {
-    public next(): number
+    public static next(): number
     {
         return Math.random();
     }
 
-    public int(min?: number, max?: number): number
+    public static int(min?: number, max?: number): number
     {
         return this.nextInt(min, max);
     }
 
-    public nextInt(min?: number, max?: number): number
+    public static nextInt(min?: number, max?: number): number
     {
         if (min != undefined && max != undefined)
         {
@@ -24,12 +24,12 @@ export class Random
         return Math.floor(this.next() * (max - min) + min);
     }
 
-    public nextIntExclusive(min?: number, max?: number): number
+    public static nextIntExclusive(min?: number, max?: number): number
     {
         return (this.nextInt(min, max));
     }
 
-    public nextIntInclusive(min?: number, max?: number): number
+    public static nextIntInclusive(min?: number, max?: number): number
     {
         if (min != undefined && max != undefined)
         {
@@ -41,12 +41,12 @@ export class Random
         return Math.floor(this.next() * (max - min + 1) + min);
     }
 
-    public float(min?: number, max?: number): number
+    public static float(min?: number, max?: number): number
     {
         return this.nextFloat(min, max);
     }
 
-    public nextFloat(min?: number, max?: number): number
+    public static nextFloat(min?: number, max?: number): number
     {
         if (min != undefined && max != undefined)
         {
@@ -56,7 +56,7 @@ export class Random
         return this.next() * (max - min) + min;
     }
 
-    public boolean(): boolean
+    public static boolean(): boolean
     {
         return (this.next() >= 0.5);
     }
