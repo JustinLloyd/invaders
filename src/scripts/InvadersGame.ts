@@ -1,68 +1,374 @@
+import * as $ from "jquery";
+import "gsap";
+import * as PIXI from 'pixi.js';
 import {GameObject} from "./GameObject";
 import {Invader} from "./Invader";
 import {DifficultySetting} from "./DifficultySetting";
-import {InvaderMissile} from "./InvaderMissile";
-import {PlayerMissile} from "./PlayerMissile";
+import {DeathRay} from "./DeathRay";
+import {Missile} from "./Missile";
 import {MissileBase} from "./MissileBase";
-import {BonusSpaceship} from "./BonusSpaceship";
+import {Bonus} from "./Bonus";
 import {Scoreboard} from "./Scoreboard";
 import {LivesIndicator} from "./LivesIndicator";
 import {GameWorld} from "./GameWorld";
-import * as $ from "jquery";
-import "gsap";
 import {GameObjectPool} from "./GameObjectPool";
+import {Playfield} from "./Playfield";
+import {DebugInfo} from "./DebugInfo";
+import {
+    MAX_SCORE,
+    TEXTURE_BONUS_01,
+    TEXTURE_BONUS_02,
+    TEXTURE_BONUS_HIT_01,
+    TEXTURE_BONUS_HIT_02,
+    TEXTURE_DEATH_RAY_01,
+    TEXTURE_DEATH_RAY_02,
+    TEXTURE_DIGIT_00,
+    TEXTURE_DIGIT_01,
+    TEXTURE_DIGIT_02,
+    TEXTURE_DIGIT_03,
+    TEXTURE_DIGIT_04,
+    TEXTURE_DIGIT_05,
+    TEXTURE_DIGIT_06,
+    TEXTURE_DIGIT_07,
+    TEXTURE_DIGIT_08,
+    TEXTURE_DIGIT_09,
+    TEXTURE_INVADER_01,
+    TEXTURE_INVADER_02,
+    TEXTURE_INVADER_HIT,
+    TEXTURE_INVADER_LANDED,
+    TEXTURE_LIVES_INDICATOR,
+    TEXTURE_MISSILE,
+    TEXTURE_MISSILE_BASE,
+    TEXTURE_MISSILE_BASE_ARMED,
+    TEXTURE_MISSILE_BASE_HIT,
+    TEXTURE_VFD_PLAYFIELD
+} from "./Constants";
+import {PlayfieldGameWorld} from "./PlayfieldGameWorld";
+import {InvaderController} from "./InvaderController";
 
-class InvadersGame extends GameWorld
+let invader_01 = require('url:../assets/invader-01.png');
+let invader_02 = require('url:../assets/invader-02.png');
+let invader_landed = require('url:../assets/invader-landed.png');
+let death_ray_01 = require('url:../assets/death-ray-01.png');
+let death_ray_02 = require('url:../assets/death-ray-02.png');
+let invader_hit = require('url:../assets/invader-hit.png');
+
+let lives_indicator = require('url:../assets/lives-indicator.png');
+let bonus_01 = require('url:../assets/bonus-01.png');
+let bonus_02 = require('url:../assets/bonus-02.png');
+let bonus_hit_01 = require('url:../assets/bonus-hit-01.png');
+let bonus_hit_02 = require('url:../assets/bonus-hit-02.png');
+
+let missile = require('url:../assets/missile.png');
+let missile_base = require('url:../assets/missile-base.png');
+let missile_base_armed = require('url:../assets/missile-base-armed.png');
+let missile_base_hit = require('url:../assets/missile-base-hit.png');
+
+let vfd_playfield = require('url:../assets/vfd-playfield.png');
+
+let digit_00 = require('url:../assets/digit-00.png');
+let digit_01 = require('url:../assets/digit-01.png');
+let digit_02 = require('url:../assets/digit-02.png');
+let digit_03 = require('url:../assets/digit-03.png');
+let digit_04 = require('url:../assets/digit-04.png');
+let digit_05 = require('url:../assets/digit-05.png');
+let digit_06 = require('url:../assets/digit-06.png');
+let digit_07 = require('url:../assets/digit-07.png');
+let digit_08 = require('url:../assets/digit-08.png');
+let digit_09 = require('url:../assets/digit-09.png');
+
+let Application = PIXI.Application,
+    Container = PIXI.Container,
+    loader = PIXI.Loader.shared,
+    resources = PIXI.Loader.shared.resources,
+    TextureCache = PIXI.utils.TextureCache,
+    Sprite = PIXI.Sprite,
+    Rectangle = PIXI.Rectangle;
+
+class Controller
 {
-    invaderMissilesPool: GameObjectPool<InvaderMissile>;
-    player: MissileBase;
-    playerMissilesPool:GameObjectPool<PlayerMissile>;
-    invadersPool: GameObjectPool<Invader>;
-    bonusSpaceship: BonusSpaceship;
-    difficulty:DifficultySetting;
-    scoreboard:Scoreboard;
-    livesIndicator:LivesIndicator;
 
-    createWorld() {
-        this.invaderMissilesPool = new GameObjectPool<InvaderMissile>();
-        this.invadersPool =  new GameObjectPool<Invader>();
-        this.playerMissilesPool = new GameObjectPool<PlayerMissile>();
+}
 
-        console.log("Creating game world");
-        this.difficulty = new DifficultySetting();
+class LocalController extends Controller
+{
+
+}
+
+class NetworkController extends Controller
+{
+
+}
+
+
+class LocalPlayerController extends LocalController
+{
+
+}
+
+class NetworkPlayerController extends NetworkController
+{
+
+}
+
+class InvadersGame extends PlayfieldGameWorld
+{
+    //deathRaysPool: GameObjectPool<DeathRay>;
+    missileBase: MissileBase;
+    bonus: Bonus;
+    difficulty: DifficultySetting;
+    scoreboard: Scoreboard;
+    livesIndicator: LivesIndicator;
+    playfield: Playfield;
+    invaderController:InvaderController;
+    _isGameWon: boolean;
+    _isGameOver: boolean;
+
+    init()
+    {
+        InvadersGame.loadAssets();
+    }
+
+    reset()
+    {
+        this._isGameOver = false;
+        this._isGameWon = false;
+        this.missileBase.reset();
+        this.livesIndicator.reset();
+        this.bonus.reset();
+        this.scoreboard.reset();
+        this.invaderController.reset();
+        // TODO if the number of death rays on the new difficulty is different than previously, then adjust the pool
+        //this.deathRaysPool.forEach(value => value.reset());
+        // TODO if the number of invaders on the new difficulty is different than previously, then adjust the pool
+        //this.invadersPool.forEach(value=>value.reset());
+    }
+
+    public onScoreUpdated(score: number)
+    {
+        if (score >= MAX_SCORE)
+        {
+            this._isGameWon = true;
+            // game won
+        }
+    }
+
+    public createWorld()
+    {
+
+        this.playfield = GameObject.CreateGameObject(Playfield);
+        this.difficulty = GameObject.CreateGameObject(DifficultySetting);
         this.scoreboard = GameObject.CreateGameObject(Scoreboard);
         this.livesIndicator = GameObject.CreateGameObject(LivesIndicator);
-        this.player=GameObject.CreateGameObject(MissileBase);
-        this.bonusSpaceship = GameObject.CreateGameObject(BonusSpaceship);
+        this.missileBase = GameObject.CreateGameObject(MissileBase);
+        this.bonus = GameObject.CreateGameObject(Bonus);
+        this.bonus.deactivate();
+        this.scoreboard.onScoreUpdated = (score) => this.onScoreUpdated(score);
+        this.bonus.onDead = () => this.scoreboard.addPoints(this.bonus.pointValue);
+        this.invaderController = GameObject.CreateGameObject(InvaderController);
 
-        for (let i = 0; i < this.difficulty.invaderMissiles; i++)
+        // TODO if the number of death rays on the new difficulty is different than previously, then adjust the pool
+        // for (let i = 0; i < DifficultySetting.difficulty.deathRayCount; i++)
+        // {
+        //     let deathRay = GameObject.CreateGameObject(DeathRay);
+        //     deathRay.deactivate();
+        //     this.deathRaysPool.push(deathRay);
+        // }
+
+        if (this.isDebug)
         {
-            this.invaderMissilesPool.push(GameObject.CreateGameObject(InvaderMissile));
+            this.ValidateSpritePlacements();
         }
 
-        for (let i = 0; i < this.difficulty.invaders; i++)
+        // for (let i = 0; i < DifficultySetting.difficulty.invaderCount; i++)
+        // {
+        //     let invader = GameObject.CreateGameObject(Invader);
+        //     invader.deactivate();
+        //     invader.row = i;
+        //     invader.col = i;
+        //     this.invadersPool.push(invader);
+        // }
+
+    }
+
+    protected get isGameFinished(): boolean
+    {
+        return (this._isGameWon || this._isGameOver);
+    }
+
+    protected localUpdate()
+    {
+        if (this.inputSystem.isDownReset())
         {
-            this.invadersPool.push(GameObject.CreateGameObject(Invader));
+            this.reset();
+            return;
         }
 
-        for (let i = 0; i < this.difficulty.playerMissiles; i++)
+        if (this.isGameFinished)
         {
-            this.playerMissilesPool.push(GameObject.CreateGameObject(PlayerMissile));
+            GameWorld.app.stage.visible=!GameWorld.app.stage.visible;
+            return;
+        }
+
+        // TODO determine if we should launch an invader here
+        // determine if we should launch a bonus spaceship
+        if (this.bonus.shouldAppear)
+        {
+            this.bonus.appear();
+        }
+
+        if (this.inputSystem.isDownFire())
+        {
+            this.missileBase.fireIfCan();
+        }
+
+        if (this.inputSystem.isDownMoveLeft())
+        {
+            this.missileBase.moveLeftIfCan();
+        }
+        else if (this.inputSystem.isDownMoveRight())
+        {
+            this.missileBase.moveRightIfCan();
+        }
+        else
+        {
+            this.missileBase.moveCenterIfCan();
+        }
+
+        // TODO determine if the bonus spaceship hass been hit by a player missile
+
+        // TODO determine if an invader has been hit by a player missile
+        // TODO determine if an invader missile has hit the player
+        // TODO determine if the invaders have landed here
+        // TODO determine if the game is over when the player runs out of life here
+    }
+
+
+    private static loadAssets()
+    {
+        loader
+            // invaders
+            .add(TEXTURE_INVADER_01, invader_01)
+            .add(TEXTURE_INVADER_02, invader_02)
+            .add(TEXTURE_INVADER_LANDED, invader_landed)
+            .add(TEXTURE_DEATH_RAY_01, death_ray_01)
+            .add(TEXTURE_DEATH_RAY_02, death_ray_02)
+            .add(TEXTURE_INVADER_HIT, invader_hit)
+
+            // bonus ufo
+            .add(TEXTURE_BONUS_01, bonus_01)
+            .add(TEXTURE_BONUS_02, bonus_02)
+            .add(TEXTURE_BONUS_HIT_01, bonus_hit_01)
+            .add(TEXTURE_BONUS_HIT_02, bonus_hit_02)
+
+            // player
+            .add(TEXTURE_MISSILE_BASE, missile_base)
+            .add(TEXTURE_MISSILE_BASE_ARMED, missile_base_armed)
+            .add(TEXTURE_MISSILE, missile)
+            .add(TEXTURE_LIVES_INDICATOR, lives_indicator)
+            .add(TEXTURE_MISSILE_BASE_HIT, missile_base_hit)
+
+            // scoreboard
+            .add(TEXTURE_DIGIT_00, digit_00)
+            .add(TEXTURE_DIGIT_01, digit_01)
+            .add(TEXTURE_DIGIT_02, digit_02)
+            .add(TEXTURE_DIGIT_03, digit_03)
+            .add(TEXTURE_DIGIT_04, digit_04)
+            .add(TEXTURE_DIGIT_05, digit_05)
+            .add(TEXTURE_DIGIT_06, digit_06)
+            .add(TEXTURE_DIGIT_07, digit_07)
+            .add(TEXTURE_DIGIT_08, digit_08)
+            .add(TEXTURE_DIGIT_09, digit_09)
+
+            // playfield
+            .add(TEXTURE_VFD_PLAYFIELD, vfd_playfield)
+            .load(InvadersGame.onAssetsLoaded);
+    }
+
+    private static onAssetsLoaded()
+    {
+        (GameWorld.instance as InvadersGame).createWorld();
+        (GameWorld.instance as InvadersGame).reset();
+        GameWorld.instance.go();
+
+    }
+
+    private ValidateSpritePlacements()
+    {
+        for (let x = 0; x < 3; x++)
+        {
+            for (let y = 0; y < 6; y++)
+            {
+                let go = GameObject.CreateGameObject(Invader);
+                go.row = y;
+                go.col = x;
+            }
+        }
+
+        for (let x = 0; x < 3; x++)
+        {
+            for (let y = 0; y < 6; y++)
+            {
+                let go = GameObject.CreateGameObject(Invader);
+                go.col = x;
+                go.die();
+                go.row = y;
+            }
+        }
+        for (let x = 0; x < 3; x++)
+        {
+            for (let y = 0; y < 6; y++)
+            {
+                let go = GameObject.CreateGameObject(Missile);
+                go.row = y;
+                go.col = x;
+            }
+        }
+
+        GameObject.CreateGameObject(DebugInfo);
+
+        for (let x = 0; x < 3; x++)
+        {
+            for (let y = 0; y < 5; y++)
+            {
+                let go = GameObject.CreateGameObject(DeathRay);
+                go.col = x;
+                go.row = y;
+            }
+        }
+
+        for (let x = 0; x < 3; x++)
+        {
+            let go = GameObject.CreateGameObject(Bonus);
+            go.col = x;
+        }
+
+        for (let x = 0; x < 3; x++)
+        {
+            let go = GameObject.CreateGameObject(Bonus);
+            go.die();
+            go.col = x;
+        }
+
+        for (let x = 0; x < 3; x++)
+        {
+            let go = GameObject.CreateGameObject(MissileBase);
+            go.col = x;
+        }
+
+        for (let x = 0; x < 3; x++)
+        {
+            let go = GameObject.CreateGameObject(MissileBase);
+            go.col = x;
+            go.die();
         }
 
     }
 }
 
-var img_alien02 = new Image();
-img_alien02.src = 'data:image/svg+xml,\
-	<svg xmlns="http://www.w3.org/2000/svg" width="65.86" height="51.56" viewBox="0 0 65.86 51.56"><g class="alien-02"><path class="alien-02" d="M17.14,30.21a23.64,23.64,0,0,1-6.45-5.64A10,10,0,0,1,13.91,22l1-2.15a3.2,3.2,0,0,1,1.45,2.9c.42,1.71,1.81,3.07,3.54,4.3C18.32,27.7,17.17,28.59,17.14,30.21Z"/><path class="alien-02" d="M48.73,30.21a23.64,23.64,0,0,0,6.45-5.64A10,10,0,0,0,52,22l-1-2.15a3.2,3.2,0,0,0-1.45,2.9c-.41,1.71-1.81,3.07-3.54,4.3C47.54,27.7,48.69,28.59,48.73,30.21Z"/><path class="alien-02" d="M1.05,22.13a46.27,46.27,0,0,0,12.77-6.56,8.45,8.45,0,0,0-2.55-4.18l-3,.64A2.4,2.4,0,0,0,7.2,14.18l-5.15-.76A20.9,20.9,0,0,1,7.2,1.85C10.25-.42,14.66.79,18.92,1.08c.69,4.75-6.74,6.48-3.37,9.93C19.5,10.16,23.93,5.33,25,2.1h4.41c0,2.73,1.18,4.6,3.54,5.51,2.36-.91,3.51-2.78,3.55-5.51h4.41c1,3.23,5.48,8.06,9.42,8.91,3.38-3.45-4.06-5.18-3.37-9.93,4.27-.29,8.67-1.5,11.73.77a20.9,20.9,0,0,1,5.15,11.57l-5.16.76A2.37,2.37,0,0,0,57.56,12l-3-.64A8.48,8.48,0,0,0,52,15.57a46.18,46.18,0,0,0,12.78,6.56c.61,1.77.84,3.42,0,4.71L61.45,24.4c1.69,2.53,3.29,5,3.37,7-2.35,1.53-4.4,3.86-5.69,8.25L52.5,39.5l-.34,2.26,5.17,1.45c-3.85,2-7.5,4.16-9,7.26C47,48,44.39,47,41,47.05a20.21,20.21,0,0,1,5.16-6,6.36,6.36,0,0,0-3.65-3.89c.2-6.39.17-12.37-.88-16.56H24.22c-1,4.19-1.08,10.17-.87,16.56a2.87,2.87,0,0,1,2.09,3.51c-2.54,1.15-5.69,2-3.3,5.7-3.38,0-3.23,1.66-4.6,4.14-1.51-3.1-5.16-5.22-9-7.26l5.17-1.45-.35-2.26-6.62.17C5.44,35.28,3.39,33,1.05,31.42c.07-2,1.68-4.49,3.37-7L1.05,26.84C.21,25.55.44,23.9,1.05,22.13Z"/></g></svg>';
-
-$(function() {
-    var invaders = new InvadersGame('#canvas1');
-    invaders.createWorld();
-    invaders.go();
-
-    var ratio   = window.devicePixelRatio || 1;
-    console.log("game is ready!");
+$(function ()
+{
+    let invaders = new InvadersGame();
+    invaders.init();
 });
 

@@ -1,10 +1,14 @@
 export class DifficultyData {
-    public readonly invaders: number;
-    public readonly invaderMissiles: number;
-    public readonly invaderDescentSpeed: number;
-    public readonly bonusSpaceshipMovementSpeed: number;
+    public readonly invaderCount: number;
+    public readonly deathRayCount: number;
+    public readonly invaderDescentDelay: number;
+    public readonly bonusMovementDelay: number;
+    public readonly bonusPointValue:number;
     public readonly invaderLowestStartingRow: number;
-    public readonly playerMissiles:number;
-    public readonly playerMissileSpeed:number;
-    public readonly playerMovementSpeed:number;
+    public readonly invaderSpawnInterval:number;
+    public readonly missileCount:number;
+    public readonly missileMovementDelay:number;
+    public readonly missileBaseMovementDelay:number;
+    public readonly missileBaseFiringDelay:number;
+    public deathRayMovementDelay: number;
 }

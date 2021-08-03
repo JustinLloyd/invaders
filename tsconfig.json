@@ -5,16 +5,19 @@
     "sourceMap": true,
     "removeComments": true,
     "outDir": "build/",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "lib": [ "dom" ]
   },
   "exclude": [
     ".git",
-    "node_modules"
+    "node_modules",
+    "**/dist/**"
   ],
   "include": [
     "src/scripts/**/*",
-    "src/html/invaders.html",
+    "src/html/*",
     "src/css/*",
+    "src/assets/**/*",
     "./package.json"
   ]
 }

@@ -4,23 +4,30 @@
   "scripts": {
     "start": "parcel serve ./src/html/invaders.html",
     "build": "parcel build ./src/html/invaders.html --public-url .",
-    "watch": "parcel watch ./src/html/invaders.html"
+    "watch": "parcel watch ./src/html/invaders.html",
+    "prebuild": "rimraf \"dist\""
   },
   "file": [
     "src/scripts/",
     "src/css/",
-    "src/html/",
+    "src/html/**/*",
+    "src/assets/**/*",
     "build/",
     "dist/"
   ],
   "dependencies": {},
   "devDependencies": {
+    "@parcel/transformer-image": "^2.0.0-beta.3.1",
     "@types/gsap": "^3.0.0",
     "@types/jquery": "^3.5.6",
     "gsap": "^3.7.1",
     "inline-scripts": "^1.7.4",
     "jquery": "^3.6.0",
     "parcel": "next",
+    "pixi-filters": "^4.1.4",
+    "pixi.js": "^6.0.4",
+    "rimraf": "^3.0.2",
+    "sharp": "^0.28.3",
     "systemjs": "^6.10.2",
     "typescript": "^4.3.5"
   }
