@@ -13,6 +13,7 @@ import {
     RIGHT_COLUMN, COLLISION_DEATH_RAY, COLLISION_INVADER, COLLISION_MISSILE_BASE, TEXTURE_MISSILE_BASE_ARMED, TEXTURE_MISSILE_BASE_HIT, TEXTURE_MISSILE_BASE
 } from "./Constants";
 import {DifficultySetting} from "./DifficultySetting";
+import {Clamp} from "./Clamp";
 
 let TextureCache = utils.TextureCache;
 
@@ -197,7 +198,7 @@ export class MissileBase extends PlayfieldGameObject
                     this.replenishMissile();
                     missile.onExitPlayfield = null;
                 };
-                this.missilesAvailable = Math.max(0, this.missilesAvailable - 1);
+                this.missilesAvailable = Clamp.atMost(0, this.missilesAvailable - 1);
                 // TODO send network event
 
                 break;

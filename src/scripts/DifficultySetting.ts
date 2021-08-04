@@ -1,6 +1,7 @@
 import {DifficultyData} from "./DifficultyData";
 import {GameObject} from "./GameObject";
 import {DIFFICULTY_MAX, DIFFICULTY_MIN} from "./Constants";
+import {Clamp} from "./Clamp";
 
 export const DIFFICULTY_0_INVADER_COUNT = 2;
 export const DIFFICULTY_0_DEATH_RAY_COUNT = 2;
@@ -100,7 +101,7 @@ export class DifficultySetting extends GameObject
 
     set currentDifficulty(value: number)
     {
-        value = Math.min(DIFFICULTY_MAX, Math.max(DIFFICULTY_MIN, value));
+        value = Clamp.between(value, DIFFICULTY_MIN, DIFFICULTY_MAX);
         this._currentDifficulty = value;
     }
 

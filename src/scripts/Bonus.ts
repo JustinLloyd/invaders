@@ -4,6 +4,7 @@ import {GameObject} from "./GameObject";
 import * as CONSTANTS from "./Constants";
 import {COLLISION_BONUS, COLLISION_MISSILE, LEFT_COLUMN, RIGHT_COLUMN, TEXTURE_BONUS_01, TEXTURE_BONUS_02, TEXTURE_BONUS_HIT_01, TEXTURE_BONUS_HIT_02} from "./Constants";
 import {DifficultySetting} from "./DifficultySetting";
+import {Random} from "./Random";
 
 
 let TextureCache = utils.TextureCache;
@@ -88,7 +89,8 @@ export class Bonus extends PlayfieldGameObject
 
     public exitPlayfield()
     {
-        this.container.visible = false;
+
+        this.hide();
         this.state = BonusStates.Sleeping;
         this.dispatchOnExitPlayfield();
         // TODO send network event
@@ -115,6 +117,7 @@ export class Bonus extends PlayfieldGameObject
             return false;
         }
 
+        // TODO change this hard-coded number to a difficult setting value
         if (Math.random() > 0.1)
         {
             return false;
@@ -125,14 +128,19 @@ export class Bonus extends PlayfieldGameObject
 
     public appear()
     {
-        (Math.random() * 100) < 50 ? this.appearOnLeft() : this.appearOnRight();
-        this.container.visible = true;
-        this.bonusSpaceship.visible = true;
-        this.bonusExplosion.visible = false;
+        (Random.boolean()) ? this.appearOnLeft() : this.appearOnRight();
+        this.resetVisibility();
         this.state = BonusStates.Hovering;
         this.updateLastMovementTime();
         this.activate();
         this.dispatchOnAppear();
+        // TODO send network event
+    }
+
+    private resetVisibility()
+    {
+        this.container.visible = true;
+        this.showNormal();
         // TODO send network event
     }
 
@@ -170,7 +178,7 @@ export class Bonus extends PlayfieldGameObject
         {
             if (this.isDeathTimeElapsed)
             {
-                this.container.visible = false;
+                this.hide();
                 this.deactivate();
                 this.state = BonusStates.Sleeping;
             }
@@ -199,8 +207,7 @@ export class Bonus extends PlayfieldGameObject
     public die()
     {
         this.state = BonusStates.Dead;
-        this.bonusSpaceship.visible = false;
-        this.bonusExplosion.visible = true;
+        this.showExplosion();
         this.deathTime = Date.now();
         this.dispatchOnDead();
 
@@ -210,6 +217,12 @@ export class Bonus extends PlayfieldGameObject
         //this.bonusSpaceship.visible = false;
         // TODO send network event
 
+    }
+
+    private showExplosion()
+    {
+        this.bonusSpaceship.visible = false;
+        this.bonusExplosion.visible = true;
     }
 
     private move()
@@ -253,4 +266,9 @@ export class Bonus extends PlayfieldGameObject
     }
 
 
+    private showNormal()
+    {
+        this.bonusSpaceship.visible = true;
+        this.bonusExplosion.visible = false;
+    }
 }

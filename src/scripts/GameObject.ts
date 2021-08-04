@@ -110,14 +110,29 @@ export class GameObject
     public activate()
     {
         this._isActive = true;
-        this.container.visible = true;
+        this.show();
+        // TODO send network event
     }
 
     public deactivate()
     {
         this._isActive = false;
-        this.container.visible = false;
+        this.hide();
+        // TODO send network event
     }
+
+    public hide()
+    {
+        this.container.visible = false;
+        // TODO send network event
+    }
+
+    private show()
+    {
+        this.container.visible=true;
+        // TODO send network event
+    }
+
 
     public get isActive(): boolean
     {
