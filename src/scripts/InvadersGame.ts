@@ -120,9 +120,12 @@ class InvadersGame extends PlayfieldGameWorld
         this.livesIndicator.reset();
         this.scoreboard.reset();
         this.invaderController.reset();
+        this.invaderController.enabled = true;
         this.bonusController.reset();
+        this.bonusController.enabled = true;
         this.missileBaseController.reset();
-        this.scoreboard.points = MAX_POINTS - 10;
+        this.missileBaseController.enabled = true;
+        //this.scoreboard.points = MAX_POINTS - 10;
         // TODO if the number of death rays on the new difficulty is different than previously, then adjust the pool
         //this.deathRaysPool.forEach(value => value.reset());
     }
@@ -130,6 +133,9 @@ class InvadersGame extends PlayfieldGameWorld
     public onOutOfLives()
     {
         this.gameState = GameState.PlayerLost;
+        this.invaderController.enabled = false;
+        this.bonusController.enabled = false;
+        this.missileBaseController.enabled = false;
     }
 
     public onPointsUpdated(points: number)
@@ -141,6 +147,9 @@ class InvadersGame extends PlayfieldGameWorld
     {
         console.log("Maximum points reached");
         this.gameState = GameState.PlayerWon;
+        this.invaderController.enabled = false;
+        this.bonusController.enabled = false;
+        this.missileBaseController.enabled = false;
     }
 
     public createWorld()
@@ -196,6 +205,10 @@ class InvadersGame extends PlayfieldGameWorld
     public onInvaderLanded(invader: Invader)
     {
         this.gameState = GameState.PlayerLost;
+        this.invaderController.enabled = false;
+        this.bonusController.enabled = false;
+        this.missileBaseController.enabled = false;
+
     }
 
     public onInvaderKilled(invader: Invader)

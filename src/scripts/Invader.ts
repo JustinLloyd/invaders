@@ -3,7 +3,7 @@ import {
     BOTTOM_ROW,
     COLLISION_INVADER,
     COLLISION_MISSILE,
-    COLLISION_MISSILE_BASE,
+    COLLISION_MISSILE_BASE, COLUMN_COUNT,
     INVADER_COL_OFFSET,
     INVADER_COL_STEP,
     INVADER_EXPLOSION_OFFSET_X,
@@ -29,6 +29,7 @@ import Random from "./Random";
 import DifficultySetting from "./DifficultySetting";
 import PlayfieldGameObject from "./PlayfieldGameObject";
 import Interval from "./Interval";
+import InvaderController from './InvaderController';
 
 let TextureCache = utils.TextureCache;
 
@@ -51,6 +52,8 @@ export default class Invader extends PlayfieldGameObject
     stepDownInterval: Interval = new Interval();
 
     public onLanded?: (Invader) => void;
+    public index: number;
+    public controller: InvaderController;
 
     init()
     {
@@ -160,12 +163,18 @@ export default class Invader extends PlayfieldGameObject
         this.enabled = true;
         //throw new Error("Fix this shit dude!");
         // for (;;)
-        {
-            let row = Random.between(INVADER_HIGHEST_ROW, DifficultySetting.difficulty.invaderLowestStartingRow);
-            let col = Random.between(LEFT_COLUMN, RIGHT_COLUMN);
-            this.row = row;
-            this.col = col;
-        }
+        let possiblePositions = COLUMN_COUNT * DifficultySetting.difficulty.invaderLowestStartingRow / DifficultySetting.difficulty.invaderCount;
+        let randomPosition = Random.nextIntExclusive(0, Math.floor(possiblePositions));
+        let invaderStartingPosition = randomPosition * DifficultySetting.difficulty.invaderCount + this.index;
+        let col = Math.floor(invaderStartingPosition % COLUMN_COUNT);
+        let row = Math.floor(invaderStartingPosition / COLUMN_COUNT)+ INVADER_HIGHEST_ROW;
+
+        // let row = Random.between(INVADER_HIGHEST_ROW, DifficultySetting.difficulty.invaderLowestStartingRow);
+        // let col = Random.between(LEFT_COLUMN, RIGHT_COLUMN);
+        // console.log("invaderLowestStartingRow", DifficultySetting.difficulty.invaderLowestStartingRow, row);
+        this.row = row;
+        this.col = col;
+        console.log("randomPosition", randomPosition, "invaderStartingPosition", invaderStartingPosition, "col", col, "row", row);
 
         this.dispatchOnEnterPlayfield();
     }

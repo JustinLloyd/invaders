@@ -20,6 +20,8 @@ export default class InvaderController extends GameObject
             invader.enabled = false;
             invader.row = i;
             invader.col = i;
+            invader.index = i;
+            invader.controller = this;
             this.invadersPool.push(invader);
         }
 
@@ -62,5 +64,19 @@ export default class InvaderController extends GameObject
         console.log("Found an inactive invader");
         this.spawn.update();
         invader.enterPlayfield();
+    }
+
+    public isPlayfieldSpotEmpty(col: number, row: number)
+    {
+        for (let invader of this.invadersPool)
+        {
+            if ((col == invader.col) && (row == invader.row))
+            {
+                return false;
+            }
+
+        }
+
+        return true;
     }
 }

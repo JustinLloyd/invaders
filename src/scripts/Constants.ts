@@ -7,11 +7,12 @@ export const BONUS_EXPLOSION_ROW_OFFSET = 52;
 export const RIGHT_COLUMN = 2;
 export const LEFT_COLUMN = 0;
 export const CENTER_COLUMN = 1;
+export const COLUMN_COUNT = 3;
 export const TOP_ROW = 0;
 export const BOTTOM_ROW = 6;
 export const DEFAULT_MOVEMENT_DELAY = 100;
 export const DEFAULT_DEATH_DELAY = 400;
-export const GAME_SCALE=0.5;
+export const GAME_SCALE = 0.5;
 export const DIFFICULTY_MAX = 2;
 export const DIFFICULTY_MIN = 0;
 
