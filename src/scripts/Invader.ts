@@ -1,5 +1,4 @@
 import {Sprite, utils} from 'pixi.js';
-import {PlayfieldGameObject} from "./PlayfieldGameObject";
 import {
     BOTTOM_ROW,
     COLLISION_INVADER,
@@ -9,28 +8,49 @@ import {
     INVADER_COL_STEP,
     INVADER_EXPLOSION_OFFSET_X,
     INVADER_EXPLOSION_OFFSET_Y,
+    INVADER_HIGHEST_ROW,
+    INVADER_POINT_VALUE_ROW_1,
+    INVADER_POINT_VALUE_ROW_2,
+    INVADER_POINT_VALUE_ROW_3,
+    INVADER_POINT_VALUE_ROW_4,
+    INVADER_POINT_VALUE_ROW_5,
     INVADER_ROW_OFFSET,
     INVADER_ROW_STEP,
+    LEFT_COLUMN,
+    RIGHT_COLUMN,
     TEXTURE_INVADER_01,
     TEXTURE_INVADER_02,
     TEXTURE_INVADER_HIT,
-    TEXTURE_INVADER_LANDED,
-    TOP_ROW
+    TEXTURE_INVADER_LANDED
 } from "./Constants";
-import {GameObject} from "./GameObject";
-import {DeathRay} from "./DeathRay";
+import GameObject from "./GameObject";
+import DeathRay from "./DeathRay";
+import Random from "./Random";
+import DifficultySetting from "./DifficultySetting";
+import PlayfieldGameObject from "./PlayfieldGameObject";
+import Interval from "./Interval";
 
 let TextureCache = utils.TextureCache;
 
-export class Invader extends PlayfieldGameObject
+export default class Invader extends PlayfieldGameObject
 {
-    rowPointValues: Array<number> = [3, 2, 1, 1, 0, 0];
+    rowPointValues: Array<number> = [
+        0,
+        INVADER_POINT_VALUE_ROW_1,
+        INVADER_POINT_VALUE_ROW_2,
+        INVADER_POINT_VALUE_ROW_3,
+        INVADER_POINT_VALUE_ROW_4,
+        INVADER_POINT_VALUE_ROW_5,
+        0
+    ];
     invaderTextureNames: Array<string>;
     invaderSprite: Sprite;
     invaderExplosionSprite: Sprite;
-    lastMovementTime: number;
     deathRay: DeathRay;
-    _isDead: boolean;
+    stepSidewaysInterval: Interval = new Interval();
+    stepDownInterval: Interval = new Interval();
+
+    public onLanded?: (Invader) => void;
 
     init()
     {
@@ -46,17 +66,19 @@ export class Invader extends PlayfieldGameObject
         this.invaderExplosionSprite.visible = false;
         this.invaderExplosionSprite.x = INVADER_EXPLOSION_OFFSET_X;
         this.invaderExplosionSprite.y = INVADER_EXPLOSION_OFFSET_Y;
-        this.deathRay = GameObject.CreateGameObject(DeathRay);
+        this.deathRay = GameObject.createGameObject(DeathRay);
         this.collisionFlags = COLLISION_INVADER;
         this.collisionMask = COLLISION_MISSILE | COLLISION_MISSILE_BASE;
+        this.stepSidewaysInterval.delay = DifficultySetting.difficulty.invaderStepSidewaysDelay;
+        this.stepDownInterval.delay = DifficultySetting.difficulty.invaderStepDownDelay;
     }
 
     reset()
     {
-        this.invaderSprite.visible = true;
-        this.invaderExplosionSprite.visible = false;
+        this.resetVisibility();
         this.row = 1;
         this.col = 0;
+        this.movement.reset();
     }
 
     public onRowUpdated(newRow: number)
@@ -74,7 +96,7 @@ export class Invader extends PlayfieldGameObject
         if (this.canMoveLeft)
         {
             this.col--;
-            this.lastMovementTime = Date.now();
+            this.movement.update();
             // TODO send network event
         }
 
@@ -85,7 +107,7 @@ export class Invader extends PlayfieldGameObject
         if (this.canMoveRight)
         {
             this.col++;
-            this.lastMovementTime = Date.now();
+            this.movement.update();
             // TODO send network event
         }
 
@@ -96,7 +118,7 @@ export class Invader extends PlayfieldGameObject
         if (this.canMoveDown)
         {
             this.row++;
-            this.lastMovementTime = Date.now();
+            this.movement.update();
             // TODO send network event
         }
 
@@ -104,17 +126,7 @@ export class Invader extends PlayfieldGameObject
 
     public get canMove(): boolean
     {
-        if (this.isDead)
-        {
-            return false;
-        }
-
-        if (!this.isMovementTimeElapsed)
-        {
-            return false;
-        }
-
-        return true;
+        return (!this.isDead && this.movement.hasElapsed);
     }
 
     public get hasLanded(): boolean
@@ -122,14 +134,17 @@ export class Invader extends PlayfieldGameObject
         throw Error("not implemented");
     }
 
-    public shouldAppear(): boolean
-    {
-        throw Error("not implemented");
-    }
-
     public moveIfCan()
     {
-        throw Error("not implemented");
+        if (!this.canMove)
+        {
+            return;
+        }
+
+        let shouldStepSideways = Random.next() < DifficultySetting.difficulty.invaderStepSidewaysChance;
+        let shouldStepDown = Random.next() < DifficultySetting.difficulty.invaderStepDownChance;
+
+        // throw Error("not implemented");
     }
 
     public move()
@@ -138,20 +153,28 @@ export class Invader extends PlayfieldGameObject
         this.dispatchOnMove();
     }
 
-    public appear()
+    public enterPlayfield()
     {
-        this.activate();
-        this.reset();
-        this.row = Math.floor(1 + Math.random() * 2);
-        this.col = Math.floor(Math.random() * 3);
-        this.dispatchOnAppear();
+        this.resetVisibility();
+        this._isDead = false;
+        this.enabled = true;
+        //throw new Error("Fix this shit dude!");
+        // for (;;)
+        {
+            let row = Random.between(INVADER_HIGHEST_ROW, DifficultySetting.difficulty.invaderLowestStartingRow);
+            let col = Random.between(LEFT_COLUMN, RIGHT_COLUMN);
+            this.row = row;
+            this.col = col;
+        }
+
+        this.dispatchOnEnterPlayfield();
     }
 
     public die()
     {
-        this.invaderExplosionSprite.visible = true;
-        this.invaderSprite.visible = false;
+        this.showExplosion();
         this._isDead = true;
+        this.death.update();
         this.dispatchOnDead();
     }
 
@@ -160,40 +183,59 @@ export class Invader extends PlayfieldGameObject
         return this.rowPointValues[this.row];
     }
 
-    public get isDead(): boolean
-    {
-        return this._isDead;
-    }
-
     public update()
     {
-        if (!this.canMove)
+        if (this.isDead && this.death.hasElapsed)
         {
+            this.exitPlayfield();
             return;
         }
 
-
-        if (this.isDead)
-        {
-            this.exitPlayfield();
-        }
+        this.moveIfCan();
 
     }
 
     public exitPlayfield()
     {
-        this.container.visible = false;
-        this.deactivate();
+        this.enabled = false;
     }
 
     private changeTexturesForRow(newRow: number)
     {
-        if ((newRow < TOP_ROW) || (newRow > BOTTOM_ROW))
+        if ((newRow < INVADER_HIGHEST_ROW) || (newRow > BOTTOM_ROW))
         {
             return;
         }
 
         this.invaderSprite.texture = TextureCache[this.invaderTextureNames[newRow]];
+    }
+
+    private dispatchOnLanded()
+    {
+        if (this.onLanded)
+        {
+            this.onLanded(this);
+        }
+    }
+
+    private resetVisibility()
+    {
+        this.show();
+        this.showNormal();
+        // TODO send network event
+
+    }
+
+    private showNormal()
+    {
+        this.invaderSprite.visible = true;
+        this.invaderExplosionSprite.visible = false;
+    }
+
+    private showExplosion()
+    {
+        this.invaderExplosionSprite.visible = true;
+        this.invaderSprite.visible = false;
     }
 }
 

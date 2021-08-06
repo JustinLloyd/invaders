@@ -1,6 +1,6 @@
 import {ACTION_FIRE, ACTION_MOVE_DOWN, ACTION_MOVE_LEFT, ACTION_MOVE_RIGHT, ACTION_MOVE_UP, ACTION_RESET, KEY_CODE_FIRE, KEY_CODE_MOVE_LEFT, KEY_CODE_MOVE_RIGHT, KEY_CODE_RESET} from "./Constants";
 
-export class InputSystem
+export default class InputSystem
 {
     public isDown: number;
     public isUp: number;

@@ -1,36 +1,41 @@
-import * as PIXI from 'pixi.js';
-import {PlayfieldGameObject} from "./PlayfieldGameObject";
 import {Sprite, utils} from "pixi.js";
-import GameWorld from "./GameWorld";
-import {GameObject} from "./GameObject";
-import {Missile} from "./Missile";
-import {GameObjectPool} from "./GameObjectPool";
+import GameObject from "./GameObject";
+import Missile from "./Missile";
+import GameObjectPool from "./GameObjectPool";
 import {
     CENTER_COLUMN,
     LEFT_COLUMN,
     MISSILE_BASE_COL_STEP,
     MISSILE_BASE_ROW_OFFSET,
-    RIGHT_COLUMN, COLLISION_DEATH_RAY, COLLISION_INVADER, COLLISION_MISSILE_BASE, TEXTURE_MISSILE_BASE_ARMED, TEXTURE_MISSILE_BASE_HIT, TEXTURE_MISSILE_BASE
+    RIGHT_COLUMN,
+    COLLISION_DEATH_RAY,
+    COLLISION_INVADER,
+    COLLISION_MISSILE_BASE,
+    TEXTURE_MISSILE_BASE_ARMED,
+    TEXTURE_MISSILE_BASE_HIT,
+    TEXTURE_MISSILE_BASE
 } from "./Constants";
-import {DifficultySetting} from "./DifficultySetting";
-import {Clamp} from "./Clamp";
+import DifficultySetting from "./DifficultySetting";
+import Clamp from "./Clamp";
+import Interval from "./Interval";
+import PlayfieldGameObject from "./PlayfieldGameObject";
 
 let TextureCache = utils.TextureCache;
 
-export class MissileBase extends PlayfieldGameObject
+export default class MissileBase extends PlayfieldGameObject
 {
     protected _isArmed: boolean;
-    protected _isDead: boolean;
-    protected _isDieing: boolean;
     protected missileBaseSprite: Sprite;
     protected missileBaseExplosionSprite: Sprite;
-    protected lastFiringTime: number = 0;
+    protected firingInterval: Interval;
     protected missilesAvailable: number;
     missilesPool: GameObjectPool<Missile>;
 
 
     public init()
     {
+        this.firingInterval = new Interval(DifficultySetting.difficulty.missileBaseFiringDelay);
+        this.movement.delay = DifficultySetting.difficulty.missileBaseMovementDelay;
         this.missileBaseSprite = new Sprite(TextureCache[TEXTURE_MISSILE_BASE_ARMED]);
         this.missileBaseSprite.anchor.set(0.5, 1);
         this.missileBaseSprite.x = 72;
@@ -49,13 +54,12 @@ export class MissileBase extends PlayfieldGameObject
         this.col = CENTER_COLUMN;
         this.row = 6;
         this.isRowLocked = true;
-        this.movementDelay = DifficultySetting.difficulty.missileBaseMovementDelay;
 
         this.missilesPool = new GameObjectPool<Missile>();
         for (let i = 0; i < DifficultySetting.difficulty.missileCount; i++)
         {
-            let missile = GameObject.CreateGameObject(Missile);
-            missile.deactivate();
+            let missile = GameObject.createGameObject(Missile);
+            missile.enabled = false;
             this.missilesPool.push(missile);
         }
 
@@ -63,10 +67,9 @@ export class MissileBase extends PlayfieldGameObject
 
     public reset()
     {
-        this.resetLastMovementTime();
-        this.lastFiringTime = 0;
+        this.movement.reset();
+        this.firingInterval.reset();
         this._isArmed = true;
-        this._isDieing = false;
         this._isDead = false;
         this.missileBaseSprite.texture = TextureCache[TEXTURE_MISSILE_BASE_ARMED];
         this.missileBaseSprite.visible = true;
@@ -75,7 +78,7 @@ export class MissileBase extends PlayfieldGameObject
         this.missilesPool.forEach(value =>
         {
             value.reset();
-            value.deactivate();
+            value.enabled = false;
         });
     }
 
@@ -84,20 +87,9 @@ export class MissileBase extends PlayfieldGameObject
         return this._isArmed;
     }
 
-    public get isDead(): boolean
-    {
-        return this._isDead;
-    }
-
-    public get isDieing(): boolean
-    {
-        return this._isDieing;
-    }
-
     public die()
     {
         this._isDead = true;
-        this._isDieing = true;
         this._isArmed = false;
         this.missileBaseSprite.visible = false;
         this.missileBaseExplosionSprite.visible = true;
@@ -113,7 +105,7 @@ export class MissileBase extends PlayfieldGameObject
         if (this.col > LEFT_COLUMN)
         {
             this.col--;
-            this.updateLastMovementTime();
+            this.movement.update();
             // TODO send network event
         }
 
@@ -124,7 +116,7 @@ export class MissileBase extends PlayfieldGameObject
         if (this.col < RIGHT_COLUMN)
         {
             this.col++;
-            this.updateLastMovementTime();
+            this.movement.update();
             // TODO send network event
         }
     }
@@ -132,7 +124,7 @@ export class MissileBase extends PlayfieldGameObject
     public moveCenter()
     {
         this.col = CENTER_COLUMN;
-        this.updateLastMovementTime();
+        this.movement.update();
         // TODO send network event
     }
 
@@ -151,43 +143,25 @@ export class MissileBase extends PlayfieldGameObject
 
     public get canArmMissile(): boolean
     {
-        if (this._isDead || this._isArmed || this.missilesAvailable == 0)
-        {
-            return false;
-        }
-
-        let now = Date.now();
-        if ((now - this.lastFiringTime) < DifficultySetting.difficulty.missileBaseFiringDelay)
-        {
-            return false;
-        }
-
-        return true;
+        return (!this._isDead && !this._isArmed && (this.missilesAvailable > 0) && this.firingInterval.hasElapsed);
     }
 
     public get canMove(): boolean
     {
-        if (!this.isMovementTimeElapsed)
-        {
-            return false;
-        }
-
-        return true;
+        return this.movement.hasElapsed && !this.isDead;
     }
 
     public fireMissile()
     {
-        this._isArmed = false;
-        this.lastFiringTime = Date.now();
         for (let i = 0; i < this.missilesPool.length; i++)
         {
             let missile = this.missilesPool[i];
-            if (!missile.isActive)
+            if (!missile.enabled)
             {
                 this.missileBaseSprite.texture = TextureCache[TEXTURE_MISSILE_BASE];
                 missile.reset();
                 missile.col = this.col;
-                missile.activate();
+                missile.enabled = true;
                 missile.onDead = () =>
                 {
                     this.replenishMissile();
@@ -198,15 +172,17 @@ export class MissileBase extends PlayfieldGameObject
                     this.replenishMissile();
                     missile.onExitPlayfield = null;
                 };
-                this.missilesAvailable = Clamp.atMost(0, this.missilesAvailable - 1);
+                this.missilesAvailable = Clamp.atLeast(this.missilesAvailable - 1, 0);
                 // TODO send network event
+                this._isArmed = false;
+                this.firingInterval.update();
 
                 break;
             }
         }
     }
 
-    public localUpdate(delta: number)
+    public update(secondsPassed: number)
     {
         this.armIfCan();
     }

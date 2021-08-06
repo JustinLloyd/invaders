@@ -1,4 +1,4 @@
-import {GameObject} from "./GameObject";
+import GameObject from "./GameObject";
 
-export class GameObjectPool<T extends GameObject> extends Array<T> {
+export default class GameObjectPool<T extends GameObject> extends Array<T> {
 }

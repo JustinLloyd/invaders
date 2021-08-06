@@ -1,27 +1,26 @@
 import * as PIXI from 'pixi.js';
 import * as $ from "jquery";
-import {GameObject} from "./GameObject";
-import {InputSystem} from "./InputSystem";
+import GameObject from "./GameObject";
+import InputSystem from "./InputSystem";
+import Component from "./Component";
+import {GAME_SCALE} from "./Constants";
 
+let loader = PIXI.Loader.shared;
 
-export abstract class GameWorld
+export default abstract class GameWorld
 {
     protected isDebug: boolean = false;
     protected isCheatEnabled: boolean = false;
     public isLocal: boolean;
     public static instance: GameWorld;
-    frameCount: number = 0;
-    frameRate: number = 0;
     canvas: HTMLCanvasElement;
     oldTimestamp: number;
     gameObjects: Array<GameObject>;
-    __gameObjectsToStart: Array<GameObject>;
-    __gameObjectsToDestroy: Array<GameObject>;
+    // __gameObjectsToStart: Array<GameObject>;f
+    // __gameBehavioursToStart: Array<Component>;
+    // __gameObjectsToDestroy: Array<GameObject>;
     public static app: PIXI.Application;
-    public static foregroundContainer:PIXI.Container;
-    public static backgroundContainer:PIXI.Container;
-    inputSystem: InputSystem;
-    lastBlinkTime:number;
+    public inputSystem: InputSystem;
 
     constructor()
     {
@@ -29,8 +28,8 @@ export abstract class GameWorld
         this.canvas = null;
         this.oldTimestamp = 0;
         this.gameObjects = new Array<GameObject>();
-        this.__gameObjectsToStart = new Array<GameObject>();
-        this.__gameObjectsToDestroy = new Array<GameObject>();
+        // this.__gameObjectsToStart = new Array<GameObject>();
+        // this.__gameObjectsToDestroy = new Array<GameObject>();
         this.inputSystem = new InputSystem();
         GameWorld.instance = this;
         this.initLibraries();
@@ -38,9 +37,13 @@ export abstract class GameWorld
 
     initLibraries()
     {
+        if (PIXI.utils.isWebGLSupported())
+        {
+            console.log("WebGL is supported")
+        }
         GameWorld.app = new PIXI.Application({width: 1200, height: 1700, autoStart: false, sharedLoader: true});
         GameWorld.app.ticker.maxFPS = 30;
-        //GameWorld.app.stage.scale.set(0.33);
+        GameWorld.app.stage.scale.set(GAME_SCALE);
         // GameWorld.app.view.style.width="200px";
         // GameWorld.app.view.style.height="500px";
         // GameWorld.app.renderer.resize(200, 500);
@@ -48,101 +51,90 @@ export abstract class GameWorld
         GameWorld.app.stop();
     }
 
+    private onAssetsLoaded()
+    {
+        console.log("Assets have been loaded")
+        this.init();
+        this.reset();
+        this.start();
+        GameWorld.app.ticker.add(secondsPassed => this.tick(secondsPassed));
+        GameWorld.app.start();
+        console.log(GameWorld.instance.gameObjects.length);
+    }
+
+
     go()
     {
-        GameWorld.app.ticker.add(delta => this.tick(delta));
-        GameWorld.app.start();
+        this.loadAssets();
+        loader.load(this.onAssetsLoaded.bind(this));
+
     }
 
-    public abstract init();
-
-    tick(delta: number)
+    public loadAssets()
     {
-        GameWorld.instance.gameLoop(delta);
+        // do nothing
     }
 
-    gameLoop(delta: number)
+    public reset()
     {
-        this.__gameObjectsToStart.forEach(value =>
+        // do nothing
+    }
+
+    public init()
+    {
+        // do nothing
+    }
+
+    public start()
+    {
+        // do nothing
+    }
+
+    protected _update(secondsPassed: number)
+    {
+        this.inputSystem.update();
+        this.update(secondsPassed);
+        for (let gameObject of this.gameObjects)
         {
-            value.start();
-        });
-        this.__gameObjectsToStart.length = 0;
+            gameObject._update(secondsPassed);
+        }
+
+    }
+
+    protected tick(secondsPassed: number)
+    {
+        GameWorld.instance.gameLoop(secondsPassed);
+    }
+
+    gameLoop(secondsPassed: number)
+    {
+        // this._start();
+        this._update(secondsPassed);
         this.detectCollisions();
-        this.localUpdate(delta);
-        this.networkUpdate(delta);
-        this.gameObjects.forEach(value =>
-        {
-            if (value.isActive)
-            {
-                value.update(delta);
-            }
-        });
-        if (this.isLocal)
-        {
-            this.gameObjects.forEach(value =>
-            {
-                if (value.isActive)
-                {
-                    value.localUpdate(delta);
-                }
-            });
 
-            this.inputSystem.update();
-        }
-        else
-        {
-            this.gameObjects.forEach(value =>
-            {
-                if (value.isActive)
-                {
-                    value.networkUpdate(delta);
-                }
-            });
-        }
-
-        this.gameObjects.forEach(value =>
-        {
-            if (value.isActive)
-            {
-                value.lateUpdate(delta);
-            }
-        });
-        this.lateUpdate(delta);
-        this.__gameObjectsToDestroy.forEach(value =>
-        {
-            value.container.destroy({children: true});
-            value.onDestroy();
-            const index = this.gameObjects.indexOf(value, 0);
-            if (index > -1)
-            {
-                this.gameObjects.splice(index, 1);
-            }
-
-        });
-
-        this.__gameObjectsToDestroy.length = 0;
+        this._lateUpdate(secondsPassed);
+        // this._cleanupGameObjects();
     }
 
-    protected lateUpdate(delta: number)
+    protected lateUpdate(secondsPassed: number)
     {
         // do nothing
     }
 
-    protected update(delta: number)
+    protected update(secondsPassed: number)
     {
         // do nothing
     }
 
-    protected localUpdate(delta: number)
-    {
-        // do nothing
-    }
+    // protected localUpdate(secondsPassed: number)
+    // {
+    //     // do nothing
+    // }
 
-    protected networkUpdate(delta: number)
-    {
-        // do nothing
-    }
+    // protected networkUpdate(secondsPassed: number)
+    // {
+    //     // do nothing
+    // }
 
     // naive collisin detector
     protected detectCollisions()
@@ -155,7 +147,7 @@ export abstract class GameWorld
         for (let i = 0; i < this.gameObjects.length - 1; i++)
         {
             let thisOne = this.gameObjects[i];
-            if (!thisOne.isActive)
+            if (!thisOne.enabled)
             {
                 continue;
             }
@@ -163,7 +155,7 @@ export abstract class GameWorld
             for (let j = i + 1; j < this.gameObjects.length; j++)
             {
                 let thatOne = this.gameObjects[j];
-                if (!thatOne.isActive)
+                if (!thatOne.enabled)
                 {
                     continue;
                 }
@@ -186,6 +178,41 @@ export abstract class GameWorld
     {
         return false;
     }
-}
 
-export default GameWorld;
+    private _cleanupGameObjects()
+    {
+        // this.__gameObjectsToDestroy.forEach(value =>
+        // {
+        //     value.destroy();
+        //     const index = this.gameObjects.indexOf(value, 0);
+        //     if (index > -1)
+        //     {
+        //         this.gameObjects.splice(index, 1);
+        //     }
+        //
+        // });
+        //
+        // this.__gameObjectsToDestroy.length = 0;
+
+    }
+
+    private _lateUpdate(secondsPassed: number)
+    {
+        this.lateUpdate(secondsPassed);
+        for (let gameObject of this.gameObjects)
+        {
+            gameObject._lateUpdate(secondsPassed);
+        }
+
+    }
+
+    private _start()
+    {
+        // this.__gameObjectsToStart.forEach(value =>
+        // {
+        //     value._start();
+        // });
+        // this.__gameObjectsToStart.length = 0;
+
+    }
+}

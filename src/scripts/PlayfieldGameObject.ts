@@ -1,40 +1,32 @@
-import * as PIXI from 'pixi.js';
-import {GameObject} from "./GameObject";
-import {BOTTOM_ROW, LEFT_COLUMN, RIGHT_COLUMN, TOP_ROW} from "./Constants";
+import GameObject from "./GameObject";
+import {BOTTOM_ROW, DEFAULT_DEATH_DELAY, DEFAULT_MOVEMENT_DELAY, LEFT_COLUMN, RIGHT_COLUMN, TOP_ROW} from "./Constants";
+import Interval from "./Interval";
+import Validation from "./Validation";
+import VFDGameObject from "./VFDGameObject";
 
-// let TextureCache = PIXI.utils.TextureCache;
-
-export class PlayfieldGameObject extends GameObject
+export default class PlayfieldGameObject extends VFDGameObject
 {
     protected isRowLocked: boolean;
     protected isColLocked: boolean;
-    protected canMoveOutsidePlayfield: boolean;
+    protected isLockedToPlayfield: boolean;
     protected rowOffset: number = 0;
     protected rowStep: number = 0;
     protected colOffset: number = 0;
     protected colStep: number = 0;
     protected _row: number = 0;
     protected _col: number = 0;
-    public onAppear?: () => void;
-    public onDead?: () => void;
-    public onMove?: () => void;
-    public onExitPlayfield?: () => void;
-    public lastMovementTime: number = 0;
-    public movementDelay:number=100;
+    protected _isDead: boolean = false;
 
-    public get isMovementTimeElapsed(): boolean
-    {
-        return (Date.now() - this.lastMovementTime) >= this.movementDelay;
-    }
+    public onEnterPlayfield?: (GameObject) => void;
+    public onDead?: (GameObject) => void;
+    public onMove?: (GameObject) => void;
+    public onExitPlayfield?: (GameObject) => void;
+    protected movement: Interval = new Interval(DEFAULT_MOVEMENT_DELAY);
+    protected death: Interval = new Interval(DEFAULT_DEATH_DELAY);
 
-    public updateLastMovementTime()
+    public get isDead(): boolean
     {
-        this.lastMovementTime = Date.now();
-    }
-
-    public resetLastMovementTime()
-    {
-        this.lastMovementTime=0;
+        return this._isDead;
     }
 
     public get row(): number
@@ -54,12 +46,13 @@ export class PlayfieldGameObject extends GameObject
             throw new RangeError("Row on this VFD game object is locked");
         }
 
-        if (this.canMoveOutsidePlayfield == false)
+        if (this.isLockedToPlayfield == true)
         {
-            if ((newRow < TOP_ROW) || (newRow > BOTTOM_ROW))
-            {
-                throw new RangeError("Row value must be between 0 and 6");
-            }
+            Validation.range(newRow, TOP_ROW, BOTTOM_ROW);
+            // if ((newRow < TOP_ROW) || (newRow > BOTTOM_ROW))
+            // {
+            //     throw new RangeError("Row value must be between 0 and 6");
+            // }
         }
 
         this._row = newRow;
@@ -95,12 +88,13 @@ export class PlayfieldGameObject extends GameObject
             throw new RangeError("Column on this VFD game object is locked");
         }
 
-        if (this.canMoveOutsidePlayfield == false)
+        if (this.isLockedToPlayfield == true)
         {
-            if ((newCol < LEFT_COLUMN) || (newCol > RIGHT_COLUMN))
-            {
-                throw new RangeError("Column value must be between 0 and 2");
-            }
+            Validation.range(newCol, LEFT_COLUMN, RIGHT_COLUMN);
+            // if ((newCol < LEFT_COLUMN) || (newCol > RIGHT_COLUMN))
+            // {
+            //     throw new RangeError("Column value must be between 0 and 2");
+            // }
         }
 
         this._col = newCol;
@@ -110,22 +104,22 @@ export class PlayfieldGameObject extends GameObject
 
     protected get canMoveLeft(): boolean
     {
-        return (this._col > LEFT_COLUMN || this.canMoveOutsidePlayfield);
+        return (this._col > LEFT_COLUMN || !this.isLockedToPlayfield);
     }
 
     protected get canMoveRight(): boolean
     {
-        return (this._col < RIGHT_COLUMN || this.canMoveOutsidePlayfield);
+        return (this._col < RIGHT_COLUMN || !this.isLockedToPlayfield);
     }
 
     protected get canMoveUp(): boolean
     {
-        return (this._row > TOP_ROW || this.canMoveOutsidePlayfield);
+        return (this._row > TOP_ROW || !this.isLockedToPlayfield);
     }
 
     protected get canMoveDown(): boolean
     {
-        return (this._row < BOTTOM_ROW || this.canMoveOutsidePlayfield);
+        return (this._row < BOTTOM_ROW || !this.isLockedToPlayfield);
     }
 
     public set col(value: number)
@@ -142,7 +136,7 @@ export class PlayfieldGameObject extends GameObject
     {
         if (this.onDead)
         {
-            this.onDead();
+            this.onDead(this);
         }
 
     }
@@ -151,16 +145,16 @@ export class PlayfieldGameObject extends GameObject
     {
         if (this.onExitPlayfield)
         {
-            this.onExitPlayfield();
+            this.onExitPlayfield(this);
         }
 
     }
 
-    protected dispatchOnAppear()
+    protected dispatchOnEnterPlayfield()
     {
-        if (this.onAppear)
+        if (this.onEnterPlayfield)
         {
-            this.onAppear();
+            this.onEnterPlayfield(this);
         }
 
     }
@@ -169,7 +163,7 @@ export class PlayfieldGameObject extends GameObject
     {
         if (this.onMove)
         {
-            this.onMove();
+            this.onMove(this);
         }
 
     }

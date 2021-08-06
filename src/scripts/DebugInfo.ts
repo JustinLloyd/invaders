@@ -1,6 +1,6 @@
-import {GameObject} from "./GameObject";
+import GameObject from "./GameObject";
 
-export class DebugInfo extends GameObject
+export default class DebugInfo extends GameObject
 {
     init()
     {

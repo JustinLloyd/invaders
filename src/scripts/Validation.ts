@@ -1,4 +1,4 @@
-export class Validation
+export default class Validation
 {
     public static int(value: number)
     {
@@ -70,7 +70,7 @@ export class Validation
         throw new Error(`Value must be greater than ${bound} but passed ${value}`);
     }
 
-    public gte(value: number, bound: number)
+    public static gte(value: number, bound: number)
     {
         if (value >= bound)
         {

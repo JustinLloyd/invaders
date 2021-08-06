@@ -1,11 +1,11 @@
 import * as PIXI from 'pixi.js';
-import {GameObject} from "./GameObject";
+import GameObject from "./GameObject";
 import {Sprite, Container, utils} from "pixi.js";
 import {TEXTURE_VFD_PLAYFIELD} from "./Constants";
 
 let TextureCache = utils.TextureCache;
 
-export class Playfield extends GameObject
+export default class Playfield extends GameObject
 {
     playfieldSprite: Sprite;
 

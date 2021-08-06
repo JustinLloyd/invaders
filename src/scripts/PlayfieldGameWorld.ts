@@ -1,7 +1,7 @@
-import {GameWorld} from "./GameWorld";
-import {PlayfieldGameObject} from "./PlayfieldGameObject";
+import GameWorld from "./GameWorld";
+import PlayfieldGameObject from "./PlayfieldGameObject";
 
-export abstract class PlayfieldGameWorld extends GameWorld
+export default abstract class PlayfieldGameWorld extends GameWorld
 {
     protected isColliding(thisOne: PlayfieldGameObject, thatOne: PlayfieldGameObject)
     {

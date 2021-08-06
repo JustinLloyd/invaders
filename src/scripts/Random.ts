@@ -1,6 +1,6 @@
-import {Validation} from "./Validation";
+import Validation from "./Validation";
 
-export class Random
+export default class Random
 {
     public static next(): number
     {
@@ -39,6 +39,11 @@ export class Random
         Validation.int(min);
         Validation.int(max);
         return Math.floor(this.next() * (max - min + 1) + min);
+    }
+
+    public static between(min?: number, max?: number): number
+    {
+        return this.nextIntInclusive(min, max);
     }
 
     public static float(min?: number, max?: number): number

@@ -1,7 +1,6 @@
 import {Sprite, utils} from "pixi.js";
-import {GameObject} from "./GameObject";
+import GameObject from "./GameObject";
 import {
-    MAX_SCORE,
     SCOREBOARD_OFFSET_X,
     SCOREBOARD_OFFSET_Y,
     SCOREBOARD_STEP_X,
@@ -16,15 +15,21 @@ import {
     TEXTURE_DIGIT_08,
     TEXTURE_DIGIT_09
 } from "./Constants";
+import VFDGameObject from "./VFDGameObject";
+import Validation from "./Validation";
+import DifficultySetting, {DIFFICULTY_0_BONUS_POINT_VALUE} from "./DifficultySetting";
 
 let TextureCache = utils.TextureCache;
 
-export class Scoreboard extends GameObject
+export default class Scoreboard extends VFDGameObject
 {
-    _score: number;
+    protected _points: number;
     private digitSprites: Array<Sprite>;
     private digitTextures: Array<string>;
-    public onScoreUpdated?: (score: number) => void;
+    public onPointsUpdated?: (points: number) => void;
+    public onMaximumPointsAchieved?: (points: number) => void;
+    public onMaximumPointsUpdated?: (points: number) => void;
+    protected _maximumPoints: number;
 
     init()
     {
@@ -57,57 +62,91 @@ export class Scoreboard extends GameObject
 
     reset()
     {
-        this.digitSprites.forEach(value =>
-        {
-            value.visible = true;
-            value.texture = TextureCache[TEXTURE_DIGIT_00];
-        });
-
-        this.score = 0;
+        this._points = 0;
+        this.setDisplayDigits(this._points);
     }
 
-    public set score(value: number)
+    public set points(points: number)
     {
-        if (value < 0)
-        {
-            throw new RangeError("Score is out of range");
-        }
+        Validation.gte(points, 0);
 
-        this._score = Math.min(MAX_SCORE, value);
-        this.setDisplayDigits(this._score);
+        this._points = Math.min(this._maximumPoints, points);
+        this.setDisplayDigits(this._points);
         // TODO send server event
-        this.dispatchOnScoreUpdated(this._score);
+        this.dispatchOnPointsUpdated(this._points);
+        if (this._points >= this._maximumPoints)
+        {
+            console.log("On maximum points reached, dispatching maximum pointsevent");
+            this.dispatchOnMaximumPointsAchieved(this._points);
+        }
     }
 
     public addPoints(points: number)
     {
-        this.score += points;
+        Validation.gt(points, 0);
+        Validation.lte(points, DifficultySetting.difficulty.bonusPointValue);
+        this.points += points;
         // TODO send server event
     }
 
-    protected setDisplayDigits(score: number)
+    protected setDisplayDigits(points: number)
     {
         let divisor = 100;
         for (let digit = 0; digit < 3; digit++)
         {
-            let result = Math.floor(score / divisor % 10);
-            let remainder = score % divisor;
+            let result = Math.floor(points / divisor % 10);
+            let remainder = points % divisor;
             divisor /= 10;
-            this.digitSprites[digit].visible = (result > 0) || (digit == 2) || (score / divisor >= 10);
+            this.digitSprites[digit].visible = (result > 0) || (digit == 2) || (points / divisor >= 10);
             this.digitSprites[digit].texture = TextureCache[this.digitTextures[result]];
         }
     }
 
-    public get score(): number
+    public get maximumPoints(): number
     {
-        return this._score;
+        return (this._maximumPoints);
     }
 
-    private dispatchOnScoreUpdated(score: number)
+    public set maximumPoints(maximumPoints: number)
     {
-        if (this.onScoreUpdated)
+        Validation.gte(maximumPoints, 0);
+
+        if (maximumPoints == this._maximumPoints)
         {
-            this.onScoreUpdated(score);
+            return;
+        }
+
+        this._maximumPoints = maximumPoints;
+        this.dispatchOnMaximumPointsUpdated();
+
+    }
+
+    public get points(): number
+    {
+        return this._points;
+    }
+
+    private dispatchOnPointsUpdated(points: number)
+    {
+        if (this.onPointsUpdated)
+        {
+            this.onPointsUpdated(points);
+        }
+    }
+
+    private dispatchOnMaximumPointsAchieved(points: number)
+    {
+        if (this.onMaximumPointsAchieved)
+        {
+            this.onMaximumPointsAchieved(points);
+        }
+    }
+
+    public dispatchOnMaximumPointsUpdated()
+    {
+        if (this.onMaximumPointsUpdated)
+        {
+            this.onMaximumPointsUpdated(this._maximumPoints);
         }
     }
 }

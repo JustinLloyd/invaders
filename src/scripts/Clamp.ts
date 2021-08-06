@@ -1,4 +1,4 @@
-export class Clamp
+export default class Clamp
 {
     public static atMost(value: number, bound: number): number
     {

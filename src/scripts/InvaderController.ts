@@ -1,20 +1,23 @@
-import {GameObject} from "./GameObject";
-import {GameObjectPool} from "./GameObjectPool";
-import {DifficultySetting} from "./DifficultySetting";
-import {Invader} from "./Invader";
+import GameObject from "./GameObject";
+import GameObjectPool from "./GameObjectPool";
+import DifficultySetting from "./DifficultySetting";
+import Invader from "./Invader";
+import Random from "./Random";
+import Interval from "./Interval";
 
-export class InvaderController extends GameObject
+export default class InvaderController extends GameObject
 {
     invadersPool: GameObjectPool<Invader>;
-    lastInvaderSpawnTime: number;
+    protected spawn: Interval = new Interval();
 
     public init()
     {
+        this.spawn.delay = DifficultySetting.difficulty.invaderSpawnInterval;
         this.invadersPool = new GameObjectPool<Invader>();
         for (let i = 0; i < DifficultySetting.difficulty.invaderCount; i++)
         {
-            let invader = GameObject.CreateGameObject(Invader);
-            invader.deactivate();
+            let invader = GameObject.createGameObject(Invader);
+            invader.enabled = false;
             invader.row = i;
             invader.col = i;
             this.invadersPool.push(invader);
@@ -24,40 +27,30 @@ export class InvaderController extends GameObject
 
     public reset()
     {
-        this.lastInvaderSpawnTime = 0;
+        this.spawn.reset();
     }
 
-    public get shouldAppear(): boolean
+    public get shouldSpawnInvader(): boolean
     {
-        if (Math.random() < 0.5)
-        {
-            return false;
-        }
-
-        if ((Date.now() - this.lastInvaderSpawnTime) < DifficultySetting.difficulty.invaderSpawnInterval)
-        {
-            return false;
-        }
-
-        return true;
+        return ((Random.next() < DifficultySetting.difficulty.invaderSpawnChance) && this.spawn.hasElapsed);
     }
 
     public update()
     {
-        if (!this.shouldAppear)
-        {
-            return;
-        }
-
         this.spawnInvaderIfCan();
     }
 
     public spawnInvaderIfCan()
     {
+        if (!this.shouldSpawnInvader)
+        {
+            return;
+        }
+
         for (let i = 0; i < this.invadersPool.length; i++)
         {
             let invader = this.invadersPool[i];
-            if (!invader.isActive)
+            if (!invader.enabled)
             {
                 this.spawnInvader(invader);
             }
@@ -67,8 +60,7 @@ export class InvaderController extends GameObject
     private spawnInvader(invader: Invader)
     {
         console.log("Found an inactive invader");
-        this.lastInvaderSpawnTime = Date.now();
-        invader.appear();
-
+        this.spawn.update();
+        invader.enterPlayfield();
     }
 }

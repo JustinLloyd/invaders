@@ -1,10 +1,10 @@
 import {Sprite, utils} from "pixi.js";
-import {PlayfieldGameObject} from "./PlayfieldGameObject";
-import {GameObject} from "./GameObject";
+import GameObject from "./GameObject";
 import * as CONSTANTS from "./Constants";
 import {COLLISION_BONUS, COLLISION_MISSILE, LEFT_COLUMN, RIGHT_COLUMN, TEXTURE_BONUS_01, TEXTURE_BONUS_02, TEXTURE_BONUS_HIT_01, TEXTURE_BONUS_HIT_02} from "./Constants";
-import {DifficultySetting} from "./DifficultySetting";
-import {Random} from "./Random";
+import DifficultySetting from "./DifficultySetting";
+import Random from "./Random";
+import PlayfieldGameObject from "./PlayfieldGameObject";
 
 
 let TextureCache = utils.TextureCache;
@@ -22,7 +22,7 @@ enum MovementDirection
     RightToLeft
 }
 
-export class Bonus extends PlayfieldGameObject
+export default class Bonus extends PlayfieldGameObject
 {
     state: BonusStates;
     bonusSpaceship: Sprite;
@@ -31,11 +31,10 @@ export class Bonus extends PlayfieldGameObject
     bonusSpaceshipTextureNames: Array<string>;
     bonusExplosionTextureNames: Array<string>;
     pointValue: number;
-    private deathTime: number;
 
     public init()
     {
-        this.canMoveOutsidePlayfield = true;
+        this.isLockedToPlayfield = false;
         this.colOffset = CONSTANTS.BONUS_COL_OFFSET;
         this.colStep = CONSTANTS.BONUS_COL_STEP;
         this.rowOffset = CONSTANTS.BONUS_ROW_OFFSET;
@@ -55,14 +54,14 @@ export class Bonus extends PlayfieldGameObject
         this.isRowLocked = true;
         this.collisionFlags = COLLISION_BONUS;
         this.collisionMask = COLLISION_MISSILE;
-        this.movementDelay = DifficultySetting.difficulty.bonusMovementDelay;
+        this.movement.delay = DifficultySetting.difficulty.bonusMovementDelay;
         this.pointValue = DifficultySetting.difficulty.bonusPointValue;
     }
 
     public reset()
     {
-        this.resetLastMovementTime();
-        this.deathTime = 0;
+        this.movement.reset();
+        this.death.reset();
         this.state = BonusStates.Sleeping;
         this.movementDirection = MovementDirection.RightToLeft;
     }
@@ -72,7 +71,7 @@ export class Bonus extends PlayfieldGameObject
         if (this.canMoveLeft)
         {
             this.col--;
-            this.updateLastMovementTime();
+            this.movement.update();
             // TODO send network event
         }
     }
@@ -82,7 +81,7 @@ export class Bonus extends PlayfieldGameObject
         if (this.canMoveRight)
         {
             this.col++;
-            this.updateLastMovementTime();
+            this.movement.update();
             // TODO send network event
         }
     }
@@ -96,21 +95,21 @@ export class Bonus extends PlayfieldGameObject
         // TODO send network event
     }
 
-    public appearOnLeft()
+    public enterPlayfieldOnLeft()
     {
         this.movementDirection = MovementDirection.LeftToRight;
         this.col = CONSTANTS.LEFT_COLUMN;
         // TODO send network event
     }
 
-    public appearOnRight()
+    public enterPlayfieldOnRight()
     {
         this.movementDirection = MovementDirection.RightToLeft;
         this.col = CONSTANTS.RIGHT_COLUMN;
         // TODO send network event
     }
 
-    public get shouldAppear(): boolean
+    public get shouldEnterPlayfield(): boolean
     {
         if (this.state != BonusStates.Sleeping)
         {
@@ -118,7 +117,7 @@ export class Bonus extends PlayfieldGameObject
         }
 
         // TODO change this hard-coded number to a difficult setting value
-        if (Math.random() > 0.1)
+        if (Random.next() > DifficultySetting.difficulty.bonusChance)
         {
             return false;
         }
@@ -126,20 +125,20 @@ export class Bonus extends PlayfieldGameObject
         return true;
     }
 
-    public appear()
+    public enterPlayfield()
     {
-        (Random.boolean()) ? this.appearOnLeft() : this.appearOnRight();
+        (Random.boolean()) ? this.enterPlayfieldOnLeft() : this.enterPlayfieldOnRight();
         this.resetVisibility();
         this.state = BonusStates.Hovering;
-        this.updateLastMovementTime();
-        this.activate();
-        this.dispatchOnAppear();
+        this.movement.update();
+        this.enabled=true;
+        this.dispatchOnEnterPlayfield();
         // TODO send network event
     }
 
     private resetVisibility()
     {
-        this.container.visible = true;
+        this.show();
         this.showNormal();
         // TODO send network event
     }
@@ -151,7 +150,7 @@ export class Bonus extends PlayfieldGameObject
             return false;
         }
 
-        if (!this.isMovementTimeElapsed)
+        if (!this.movement.hasElapsed)
         {
             return false;
         }
@@ -159,27 +158,17 @@ export class Bonus extends PlayfieldGameObject
         return true;
     }
 
-    public localUpdate(delta: number)
+    public update(secondsPassed: number)
     {
         if (this.state == BonusStates.Hovering)
         {
             this.moveIfCan();
         }
-    }
-
-    public get isDeathTimeElapsed(): boolean
-    {
-        return ((Date.now() - this.deathTime) > 800);
-    }
-
-    public update(delta: number)
-    {
-        if (this.state == BonusStates.Dead)
+        else if (this.state == BonusStates.Dead)
         {
-            if (this.isDeathTimeElapsed)
+            if (this.death.hasElapsed)
             {
-                this.hide();
-                this.deactivate();
+                this.enabled=false;
                 this.state = BonusStates.Sleeping;
             }
         }
@@ -208,7 +197,7 @@ export class Bonus extends PlayfieldGameObject
     {
         this.state = BonusStates.Dead;
         this.showExplosion();
-        this.deathTime = Date.now();
+        this.death.update();
         this.dispatchOnDead();
 
         // change the explosion texture depending on which column the bonus spaceshp was displaying on
