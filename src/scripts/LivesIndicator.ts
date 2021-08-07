@@ -1,6 +1,4 @@
-import * as PIXI from 'pixi.js';
-import GameObject from "./GameObject";
-import {Sprite, utils} from "pixi.js";
+import {Sprite, utils} from 'pixi.js';
 import {LIVES_INDICATOR_X_OFFSET, LIVES_INDICATOR_X_STEP, LIVES_INDICATOR_Y_OFFSET} from "./Constants";
 import VFDGameObject from "./VFDGameObject";
 import Validation from "./Validation";
@@ -10,13 +8,13 @@ let TextureCache = utils.TextureCache;
 export default class LivesIndicator extends VFDGameObject
 {
     protected _lives: number;
-    protected _maximumLives: number=3;
+    protected _maximumLives: number = 3;
     indicatorSprites: Array<Sprite>;
-    public onLifeDeducted?: (lives: number) => void;
-    public onLifeAdded?: (lives: number) => void;
-    public onLivesUpdated?: (lives: number) => void;
-    public onOutOfLives?: () => void;
-    public onMaximumLivesAchieved?: () => void;
+    public onLifeDeducted: Array<(lives: number) => void> = new Array<(lives: number) => void>();
+    public onLifeAdded: Array<(lives: number) => void> = new Array<(lives: number) => void>();
+    public onLivesUpdated: Array<(lives: number) => void> = new Array<(lives: number) => void>();
+    public onOutOfLives: Array<() => void> = new Array<() => void>();
+    public onMaximumLivesAchieved: Array<() => void> = new Array<() => void>();
 
     public init()
     {
@@ -89,42 +87,42 @@ export default class LivesIndicator extends VFDGameObject
 
     public dispatchOnLifeDeducted()
     {
-        if (this.onLifeDeducted)
+        for (let callback of this.onLifeDeducted)
         {
-            this.onLifeDeducted(this._lives);
+            callback(this._lives);
         }
     }
 
     public dispatchOnLifeAdded()
     {
-        if (this.onLifeAdded)
+        for (let callback of this.onLifeAdded)
         {
-            this.onLifeAdded(this._lives);
+            callback(this._lives);
         }
     }
 
     public dispatchOnLivesUpdated()
     {
-        if (this.onLivesUpdated)
+        for (let callback of this.onLivesUpdated)
         {
-            this.onLivesUpdated(this._lives);
+            callback(this._lives);
         }
     }
 
 
     public dispatchOnMaximumLivesAchieved()
     {
-        if (this.onMaximumLivesAchieved)
+        for (let callback of this.onMaximumLivesAchieved)
         {
-            this.onMaximumLivesAchieved();
+            callback();
         }
     }
 
     public dispatchOnOutOfLives()
     {
-        if (this.onOutOfLives)
+        for (let callback of this.onOutOfLives)
         {
-            this.onOutOfLives();
+            callback();
         }
     }
 

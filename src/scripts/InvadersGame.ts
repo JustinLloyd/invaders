@@ -49,6 +49,7 @@ import PlayfieldGameWorld from "./PlayfieldGameWorld";
 import InvaderController from "./InvaderController";
 import BonusController from "./BonusController";
 import MissileBaseController from "./PlayerController";
+import {EventDispatch} from './EventDispatch';
 
 let invader_01 = require('url:../assets/invader-01.png');
 let invader_02 = require('url:../assets/invader-02.png');
@@ -98,6 +99,27 @@ enum GameState
 
 }
 
+// interface TestArray<T>
+// {
+//     [position:number]:T;
+//     length:number;
+//     add(item:T):number;
+// }
+//
+// class TestArrayClass<T> implements TestArray<T>
+// {
+//     [position: number]: T;
+//
+//     public length: number;
+//
+//     public add(item: T): number
+//     {
+//         this.push
+//         return 0;
+//     }
+//
+// }
+//
 class InvadersGame extends PlayfieldGameWorld
 {
     difficulty: DifficultySetting;
@@ -108,11 +130,24 @@ class InvadersGame extends PlayfieldGameWorld
     gameState: GameState;
     private missileBaseController: MissileBaseController;
     private bonusController: BonusController;
+ //dispatchTest:EventDispatch<(lives:number) => void> = new EventDispatch<(lives:number) => void>();
+ //    public dispatchTest: Array<() => void> = new Array<() => void>() ;
+ //    public dispatchTest2: (() => void)[] = [];
 
     init()
     {
+        //this.dispatchTest2 = []
+        // this.dispatchTest2.push(this.callbackTest)
+        // this.dispatchTest.push(this.callbackTest);
+        // this.dispatchTest2.forEach(callback => callback())
         this.createWorld();
     }
+
+    public callbackTest()
+    {
+        console.log("Callback test invoked")
+    }
+
 
     reset()
     {
@@ -160,25 +195,25 @@ class InvadersGame extends PlayfieldGameWorld
         // player lives setup
         this.livesIndicator = GameObject.createGameObject(LivesIndicator);
         this.livesIndicator.maximumLives = MAX_LIVES;
-        this.livesIndicator.onOutOfLives = () => this.onOutOfLives();
+        this.livesIndicator.onOutOfLives.push(()=>this.onOutOfLives);
 
         // scoreboard setup
         this.scoreboard = GameObject.createGameObject(Scoreboard);
         this.scoreboard.maximumPoints = MAX_POINTS;
-        this.scoreboard.onPointsUpdated = (points) => this.onPointsUpdated(points);
-        this.scoreboard.onMaximumPointsAchieved = (points) => this.onMaximumPoints(points);
+        this.scoreboard.onPointsUpdated.push( (points) => this.onPointsUpdated(points));
+        this.scoreboard.onMaximumPointsAchieved.push( (points) => this.onMaximumPoints(points));
 
         // bonus setup
         this.bonusController = GameObject.createGameObject(BonusController);
-        this.bonusController.bonus.onDead = (bonus) => this.scoreboard.addPoints(bonus.pointValue);
+        this.bonusController.bonus.onDead.push( (bonus) => this.scoreboard.addPoints(bonus.pointValue));
 
         // missile base setup
         this.missileBaseController = GameObject.createGameObject(MissileBaseController);
 
         // invaders setup
         this.invaderController = GameObject.createGameObject(InvaderController);
-        this.invaderController.invadersPool.forEach(value => value.onDead = (invader) => this.onInvaderKilled(invader));
-        this.invaderController.invadersPool.forEach(value => value.onLanded = (invader) => this.onInvaderLanded(invader));
+        this.invaderController.invadersPool.forEach(value => value.onDead.push(this.onInvaderKilled));
+        this.invaderController.invadersPool.forEach(value => value.onLanded.push(this.onInvaderLanded));
 
         // TODO if the number of death rays on the new difficulty is different than previously, then adjust the pool
         if (this.isDebug)

@@ -17,10 +17,10 @@ export default class PlayfieldGameObject extends VFDGameObject
     protected _col: number = 0;
     protected _isDead: boolean = false;
 
-    public onEnterPlayfield?: (GameObject) => void;
-    public onDead?: (GameObject) => void;
-    public onMove?: (GameObject) => void;
-    public onExitPlayfield?: (GameObject) => void;
+    public onEnterPlayfield: Array<(GameObject) => void> = new Array<(GameObject) => void>();
+    public onDead: Array<(GameObject) => void> = new Array<(GameObject) => void>();
+    public onMove: Array<(GameObject) => void> = new Array<(GameObject) => void>();
+    public onExitPlayfield: Array<(GameObject) => void> = new Array<(GameObject) => void>();
     protected movement: Interval = new Interval(DEFAULT_MOVEMENT_DELAY);
     protected death: Interval = new Interval(DEFAULT_DEATH_DELAY);
 
@@ -134,36 +134,36 @@ export default class PlayfieldGameObject extends VFDGameObject
 
     protected dispatchOnDead()
     {
-        if (this.onDead)
+        for (let callback of this.onDead)
         {
-            this.onDead(this);
+            callback(this);
         }
 
     }
 
     protected dispatchOnExitPlayfield()
     {
-        if (this.onExitPlayfield)
+        for (let callback of this.onExitPlayfield)
         {
-            this.onExitPlayfield(this);
+            callback(this);
         }
 
     }
 
     protected dispatchOnEnterPlayfield()
     {
-        if (this.onEnterPlayfield)
+        for (let callback of this.onEnterPlayfield)
         {
-            this.onEnterPlayfield(this);
+            callback(this);
         }
 
     }
 
     protected dispatchOnMove()
     {
-        if (this.onMove)
+        for (let callback of this.onMove)
         {
-            this.onMove(this);
+            callback(this);
         }
 
     }

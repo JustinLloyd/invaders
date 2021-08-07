@@ -51,7 +51,7 @@ export default class Invader extends PlayfieldGameObject
     stepSidewaysInterval: Interval = new Interval();
     stepDownInterval: Interval = new Interval();
 
-    public onLanded?: (Invader) => void;
+    public onLanded: Array<(Invader) => void> = new Array<(Invader) => void>();
     public index: number;
     public controller: InvaderController;
 
@@ -161,20 +161,22 @@ export default class Invader extends PlayfieldGameObject
         this.resetVisibility();
         this._isDead = false;
         this.enabled = true;
-        //throw new Error("Fix this shit dude!");
-        // for (;;)
-        let possiblePositions = COLUMN_COUNT * DifficultySetting.difficulty.invaderLowestStartingRow / DifficultySetting.difficulty.invaderCount;
-        let randomPosition = Random.nextIntExclusive(0, Math.floor(possiblePositions));
-        let invaderStartingPosition = randomPosition * DifficultySetting.difficulty.invaderCount + this.index;
-        let col = Math.floor(invaderStartingPosition % COLUMN_COUNT);
-        let row = Math.floor(invaderStartingPosition / COLUMN_COUNT)+ INVADER_HIGHEST_ROW;
+        // let possiblePositions = COLUMN_COUNT * DifficultySetting.difficulty.invaderLowestStartingRow / DifficultySetting.difficulty.invaderCount;
+        // let randomPosition = Random.nextIntExclusive(0, Math.floor(possiblePositions));
+        // let invaderStartingPosition = randomPosition * DifficultySetting.difficulty.invaderCount + this.index;
+        // let col = Math.floor(invaderStartingPosition % COLUMN_COUNT);
+        // let row = Math.floor(invaderStartingPosition / COLUMN_COUNT)+ INVADER_HIGHEST_ROW;
+        let col;
+        let row;
+        do
+        {
+            col = Random.between(LEFT_COLUMN, RIGHT_COLUMN);
+            row = Random.between(INVADER_HIGHEST_ROW, DifficultySetting.difficulty.invaderLowestStartingRow);
+        } while (!this.controller.isPlayfieldSpotEmpty(col, row));
 
-        // let row = Random.between(INVADER_HIGHEST_ROW, DifficultySetting.difficulty.invaderLowestStartingRow);
-        // let col = Random.between(LEFT_COLUMN, RIGHT_COLUMN);
-        // console.log("invaderLowestStartingRow", DifficultySetting.difficulty.invaderLowestStartingRow, row);
         this.row = row;
         this.col = col;
-        console.log("randomPosition", randomPosition, "invaderStartingPosition", invaderStartingPosition, "col", col, "row", row);
+        //console.log("randomPosition", randomPosition, "invaderStartingPosition", invaderStartingPosition, "col", col, "row", row);
 
         this.dispatchOnEnterPlayfield();
     }
@@ -221,9 +223,9 @@ export default class Invader extends PlayfieldGameObject
 
     private dispatchOnLanded()
     {
-        if (this.onLanded)
+        for (let callback of this.onLanded)
         {
-            this.onLanded(this);
+            callback(this);
         }
     }
 

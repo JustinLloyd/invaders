@@ -26,9 +26,9 @@ export default class Scoreboard extends VFDGameObject
     protected _points: number;
     private digitSprites: Array<Sprite>;
     private digitTextures: Array<string>;
-    public onPointsUpdated?: (points: number) => void;
-    public onMaximumPointsAchieved?: (points: number) => void;
-    public onMaximumPointsUpdated?: (points: number) => void;
+    public onPointsUpdated?: Array<(points: number) => void> = new Array<(points: number) => void>();
+    public onMaximumPointsAchieved: Array<(points: number) => void> = new Array<(points: number) => void>();
+    public onMaximumPointsUpdated: Array<(points: number) => void> = new Array<(points: number) => void>();
     protected _maximumPoints: number;
 
     init()
@@ -128,25 +128,25 @@ export default class Scoreboard extends VFDGameObject
 
     private dispatchOnPointsUpdated(points: number)
     {
-        if (this.onPointsUpdated)
+        for (let callback of this.onPointsUpdated)
         {
-            this.onPointsUpdated(points);
+            callback(points);
         }
     }
 
     private dispatchOnMaximumPointsAchieved(points: number)
     {
-        if (this.onMaximumPointsAchieved)
+        for (let callback of this.onMaximumPointsAchieved)
         {
-            this.onMaximumPointsAchieved(points);
+            callback(points);
         }
     }
 
     public dispatchOnMaximumPointsUpdated()
     {
-        if (this.onMaximumPointsUpdated)
+        for (let callback of this.onMaximumPointsUpdated)
         {
-            this.onMaximumPointsUpdated(this._maximumPoints);
+            callback(this._maximumPoints);
         }
     }
 }

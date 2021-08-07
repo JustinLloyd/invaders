@@ -162,16 +162,16 @@ export default class MissileBase extends PlayfieldGameObject
                 missile.reset();
                 missile.col = this.col;
                 missile.enabled = true;
-                missile.onDead = () =>
+                missile.onDead.push( () =>
                 {
                     this.replenishMissile();
                     missile.onDead = null;
-                };
-                missile.onExitPlayfield = () =>
+                });
+                missile.onExitPlayfield.push(() =>
                 {
                     this.replenishMissile();
                     missile.onExitPlayfield = null;
-                };
+                });
                 this.missilesAvailable = Clamp.atLeast(this.missilesAvailable - 1, 0);
                 // TODO send network event
                 this._isArmed = false;

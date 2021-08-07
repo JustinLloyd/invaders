@@ -4,8 +4,8 @@ export default class GameBehaviour extends Behaviour
 {
     protected __isEnabled: boolean = true;
     protected __hasStarted: boolean = false;
-    public onEnabled?: (Component) => void;
-    public onDisabled?: (Component) => void;
+    public onEnabled: Array<(Component) => void>=new Array<(Component) => void>()
+    public onDisabled: Array<(Component) => void>= new Array<(Component) => void>();
 
 
     public _start()
@@ -80,18 +80,18 @@ export default class GameBehaviour extends Behaviour
 
     protected dispatchOnEnabled()
     {
-        if (this.onEnabled)
+        for (let callback of this.onEnabled)
         {
-            this.onEnabled(this);
+            callback(this);
         }
 
     }
 
     protected dispatchOnDisabled()
     {
-        if (this.onDisabled)
+        for (let callback of this.onDisabled)
         {
-            this.onDisabled(this);
+            callback(this);
         }
 
     }

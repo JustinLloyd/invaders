@@ -1,6 +1,6 @@
 export default class Component
 {
-    public onDestroyed?: (Component) => void;
+    public onDestroyed: Array<(Component) => void> = new Array<(Component) => void>();
 
     public _init()
     {
@@ -35,9 +35,9 @@ export default class Component
     protected dispatchOnDestroyed()
     {
         this.onDestroy();
-        if (this.onDestroyed)
+        for (let callback of this.onDestroyed)
         {
-            this.onDestroyed(this);
+            callback(this);
         }
 
     }
