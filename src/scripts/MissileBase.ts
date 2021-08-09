@@ -13,7 +13,7 @@ import {
     COLLISION_MISSILE_BASE,
     TEXTURE_MISSILE_BASE_ARMED,
     TEXTURE_MISSILE_BASE_HIT,
-    TEXTURE_MISSILE_BASE
+    TEXTURE_MISSILE_BASE, MISSILE_BASE_COL_OFFSET, MISSILE_BASE_HIT_X_OFFSET, MISSILE_BASE_HIT_Y_OFFSET
 } from "./Constants";
 import DifficultySetting from "./DifficultySetting";
 import Clamp from "./Clamp";
@@ -38,17 +38,19 @@ export default class MissileBase extends PlayfieldGameObject
         this.isLockedToPlayfield = true;
         this.missileBaseSprite = new Sprite(TextureCache[TEXTURE_MISSILE_BASE_ARMED]);
         this.missileBaseSprite.anchor.set(0.5, 1);
-        this.missileBaseSprite.x = 72;
-        this.missileBaseSprite.y = 98;
+        this.missileBaseSprite.x = 0;
+        this.missileBaseSprite.y = 0;
         this.container.addChild(this.missileBaseSprite);
         this.missileBaseExplosionSprite = new Sprite(TextureCache[TEXTURE_MISSILE_BASE_HIT]);
-        this.missileBaseExplosionSprite.x = 8;
+        this.missileBaseExplosionSprite.anchor.set(0.5, 1);
+        this.missileBaseExplosionSprite.x = MISSILE_BASE_HIT_X_OFFSET;
+        this.missileBaseExplosionSprite.y = MISSILE_BASE_HIT_Y_OFFSET;
         this.container.addChild(this.missileBaseExplosionSprite);
         this.collisionFlags = COLLISION_MISSILE_BASE;
         this.collisionMask = COLLISION_DEATH_RAY | COLLISION_INVADER;
 
         this.colStep = MISSILE_BASE_COL_STEP;
-        this.colOffset = 0;
+        this.colOffset = MISSILE_BASE_COL_OFFSET;
         this.rowOffset = MISSILE_BASE_ROW_OFFSET;
         this.rowStep = 0;
         this.col = CENTER_COLUMN;

@@ -61,6 +61,7 @@ export default class LivesIndicator extends VFDGameObject
         }
 
         this._lives++;
+        this.indicatorSprites[this._lives].visible = true;
         if (this._lives == this._maximumLives)
         {
             this.dispatchOnMaximumLivesAchieved();

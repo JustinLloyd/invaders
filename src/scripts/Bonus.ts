@@ -33,7 +33,7 @@ export default class Bonus extends PlayfieldGameObject
         this.container.addChild(this.bonusSpaceship);
         this.bonusExplosion = new Sprite(TextureCache[this.bonusExplosionTextureNames[0]]);
         this.bonusExplosion.anchor.set(0.5, 0);
-        this.bonusExplosion.y = CONSTANTS.BONUS_EXPLOSION_ROW_OFFSET;
+        this.bonusExplosion.y = CONSTANTS.BONUS_HIT_Y_OFFSET;
         this.bonusExplosion.visible = false;
         this.isPatrolling = false;
         this.container.addChild(this.bonusExplosion);

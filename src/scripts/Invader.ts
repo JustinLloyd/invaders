@@ -6,8 +6,8 @@ import {
     COLLISION_MISSILE_BASE, COLUMN_COUNT,
     INVADER_COL_OFFSET,
     INVADER_COL_STEP,
-    INVADER_EXPLOSION_OFFSET_X,
-    INVADER_EXPLOSION_OFFSET_Y,
+    INVADER_HIT_OFFSET_X,
+    INVADER_HIT_OFFSET_Y,
     INVADER_HIGHEST_ROW,
     INVADER_POINT_VALUE_ROW_1,
     INVADER_POINT_VALUE_ROW_2,
@@ -70,8 +70,8 @@ export default class Invader extends PlayfieldGameObject
         this.container.addChild(this.invaderSprite);
         this.invaderExplosionSprite = new Sprite(TextureCache[TEXTURE_INVADER_HIT]);
         this.container.addChild(this.invaderExplosionSprite);
-        this.invaderExplosionSprite.x = INVADER_EXPLOSION_OFFSET_X;
-        this.invaderExplosionSprite.y = INVADER_EXPLOSION_OFFSET_Y;
+        this.invaderExplosionSprite.x = INVADER_HIT_OFFSET_X;
+        this.invaderExplosionSprite.y = INVADER_HIT_OFFSET_Y;
         this.collisionFlags = COLLISION_INVADER;
         this.collisionMask = COLLISION_MISSILE | COLLISION_MISSILE_BASE;
         this.deathRay = VFDGameObject.createGameObject(DeathRay);
@@ -142,24 +142,16 @@ export default class Invader extends PlayfieldGameObject
         let direction = Random.leftOrRight();
         if (direction == MovementDirection.Left)
         {
-            if (this.canMoveLeft)
+            if (!this.moveLeftIfCan())
             {
-                this.moveLeft();
-            }
-            else if (this.canMoveRight)
-            {
-                this.moveRight();
+                this.moveRightIfCan();
             }
         }
         else
         {
-            if (this.canMoveRight)
+            if (!this.moveRightIfCan())
             {
-                this.moveRight();
-            }
-            else
-            {
-                this.moveLeft();
+                this.moveLeftIfCan();
             }
         }
     }
@@ -212,7 +204,7 @@ export default class Invader extends PlayfieldGameObject
         }
         else if (this.shouldStepDown)
         {
-            this.moveDown();
+            this.moveDownIfCan();
         }
 
         this.dispatchOnMove();

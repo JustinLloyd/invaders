@@ -17,7 +17,8 @@ import {
 } from "./Constants";
 import VFDGameObject from "./VFDGameObject";
 import Validation from "./Validation";
-import DifficultySetting, {DIFFICULTY_0_BONUS_POINT_VALUE} from "./DifficultySetting";
+import DifficultySetting from './DifficultySetting';
+
 
 let TextureCache = utils.TextureCache;
 
@@ -26,9 +27,9 @@ export default class Scoreboard extends VFDGameObject
     protected _points: number;
     private digitSprites: Array<Sprite>;
     private digitTextures: Array<string>;
-    public onPointsUpdated?: Array<(scoreboard:Scoreboard, points: number) => void> = new Array<(scoreboard:Scoreboard, points: number) => void>();
-    public onMaximumPointsAchieved: Array<(scoreboard:Scoreboard, points: number) => void> = new Array<(scoreboard:Scoreboard, points: number) => void>();
-    public onMaximumPointsUpdated: Array<(scoreboard:Scoreboard, points: number) => void> = new Array<(scoreboard:Scoreboard, points: number) => void>();
+    public onPointsUpdated?: Array<(scoreboard: Scoreboard, points: number) => void> = new Array<(scoreboard: Scoreboard, points: number) => void>();
+    public onMaximumPointsAchieved: Array<(scoreboard: Scoreboard, points: number) => void> = new Array<(scoreboard: Scoreboard, points: number) => void>();
+    public onMaximumPointsUpdated: Array<(scoreboard: Scoreboard, points: number) => void> = new Array<(scoreboard: Scoreboard, points: number) => void>();
     protected _maximumPoints: number;
 
     init()

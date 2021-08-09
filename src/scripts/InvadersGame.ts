@@ -16,13 +16,13 @@ import DebugInfo from "./DebugInfo";
 import {
     BOTTOM_ROW, COLUMN_COUNT, INVADER_HIGHEST_ROW,
     LEFT_COLUMN, MAX_LIVES,
-    MAX_POINTS, RIGHT_COLUMN,
+    MAX_POINTS, RIGHT_COLUMN, SCOREBOARD_OFFSET_X, SCOREBOARD_OFFSET_Y, SCOREBOARD_STEP_X,
     TEXTURE_BONUS_01,
     TEXTURE_BONUS_02,
     TEXTURE_BONUS_HIT_01,
     TEXTURE_BONUS_HIT_02,
     TEXTURE_DEATH_RAY_01,
-    TEXTURE_DEATH_RAY_02,
+    TEXTURE_DEATH_RAY_02, TEXTURE_DIFFICULTY_INDICATOR_00, TEXTURE_DIFFICULTY_INDICATOR_01, TEXTURE_DIFFICULTY_INDICATOR_02,
     TEXTURE_DIGIT_00,
     TEXTURE_DIGIT_01,
     TEXTURE_DIGIT_02,
@@ -67,6 +67,10 @@ let missile = require('url:../assets/missile.png');
 let missile_base = require('url:../assets/missile-base.png');
 let missile_base_armed = require('url:../assets/missile-base-armed.png');
 let missile_base_hit = require('url:../assets/missile-base-hit.png');
+
+let difficulty_indicator_00 = require('url:../assets/difficulty-indicator-00.png');
+let difficulty_indicator_01 = require('url:../assets/difficulty-indicator-01.png');
+let difficulty_indicator_02 = require('url:../assets/difficulty-indicator-02.png');
 
 let vfd_playfield = require('url:../assets/vfd-playfield.png');
 
@@ -146,11 +150,16 @@ class InvadersGame extends PlayfieldGameWorld
     {
         this.missileBaseController.missileBase.onExitPlayfield.push((missileBase) => this.onPlayerKilled(missileBase));
         this.livesIndicator.onOutOfLives.push((livesIndicator: LivesIndicator) => this.onOutOfLives(livesIndicator));
+        this.difficulty.onDifficultyChanged.push((difficultySetting: DifficultySetting, difficulty: number) => this.onDifficultyChanged(difficultySetting, difficulty));
         this.scoreboard.onPointsUpdated.push((scoreboard: Scoreboard, points: number) => this.onPointsUpdated(scoreboard, points));
         this.scoreboard.onMaximumPointsAchieved.push((scoreboard: Scoreboard, points: number) => this.onMaximumPoints(scoreboard, points));
         this.bonusController.bonus.onDead.push((bonus) => this.scoreboard.addPoints(bonus.pointValue));
         this.invaderController.invadersPool.forEach(value => value.onDead.push(this.onInvaderKilled.bind(this)));
         this.invaderController.invadersPool.forEach(value => value.onLanded.push(this.onInvaderLanded.bind(this)));
+        if (this.isDebug)
+        {
+            this.scoreboard.points = MAX_POINTS - 10;
+        }
     }
 
     private restartMission()
@@ -297,6 +306,11 @@ class InvadersGame extends PlayfieldGameWorld
 
     }
 
+    protected onDifficultyChanged(difficultySetting: DifficultySetting, difficulty: number)
+    {
+        this.resetGame();
+    }
+
     public loadAssets()
     {
         loader
@@ -320,6 +334,10 @@ class InvadersGame extends PlayfieldGameWorld
             .add(TEXTURE_MISSILE, missile)
             .add(TEXTURE_LIVES_INDICATOR, lives_indicator)
             .add(TEXTURE_MISSILE_BASE_HIT, missile_base_hit)
+
+            .add(TEXTURE_DIFFICULTY_INDICATOR_00, difficulty_indicator_00)
+            .add(TEXTURE_DIFFICULTY_INDICATOR_01, difficulty_indicator_01)
+            .add(TEXTURE_DIFFICULTY_INDICATOR_02, difficulty_indicator_02)
 
             // scoreboard
             .add(TEXTURE_DIGIT_00, digit_00)

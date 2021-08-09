@@ -1,171 +1,126 @@
 import DifficultyData from "./DifficultyData";
 import GameObject from "./GameObject";
-import {DIFFICULTY_MAX, DIFFICULTY_MIN} from "./Constants";
+import {
+    BOTTOM_ROW,
+    DIFFICULTY_INDICATOR_X_OFFSET,
+    DIFFICULTY_INDICATOR_Y_OFFSET,
+    DIFFICULTY_MAX,
+    DIFFICULTY_MIN,
+    INVADER_HIGHEST_ROW,
+    TEXTURE_DIFFICULTY_INDICATOR_00,
+    TEXTURE_DIFFICULTY_INDICATOR_01,
+    TEXTURE_DIFFICULTY_INDICATOR_02,
+    TEXTURE_INVADER_01,
+    TEXTURE_INVADER_02,
+    TEXTURE_INVADER_LANDED
+} from "./Constants";
+
+import * as DIFFICULTY from "./DifficultyConstants"
+
 import Clamp from "./Clamp";
 import VFDGameObject from './VFDGameObject';
+import {Sprite, utils} from 'pixi.js';
+import Validation from './Validation';
 
-// difficulty 0
-export const DIFFICULTY_0_INVADER_COUNT = 2;
-export const DIFFICULTY_0_INVADER_SPAWN_INTERVAL = 1600;
-export const DIFFICULTY_0_INVADER_SPAWN_CHANCE = 0.1;
-export const DIFFICULTY_0_INVADER_LOWEST_STARTING_ROW = 2;
-export const DIFFICULTY_0_INVADER_FIRING_DELAY = 2000;
-export const DIFFICULTY_0_INVADER_MOVEMENT_DELAY = 2000;
-export const DIFFICULTY_0_INVADER_FIRING_CHANCE = 0.005;
-export const DIFFICULTY_0_INVADER_STEP_DOWN_CHANCE = 0.005;
-export const DIFFICULTY_0_INVADER_STEP_SIDEWAYS_CHANCE = 0.01;
 
-export const DIFFICULTY_0_DEATH_RAY_COUNT = 2;
-export const DIFFICULTY_0_DEATH_RAY_MOVEMENT_DELAY = 400;
-
-export const DIFFICULTY_0_BONUS_CHANCE = 0.0075;
-export const DIFFICULTY_0_BONUS_MOVEMENT_DELAY = 1000;
-export const DIFFICULTY_0_BONUS_POINT_VALUE = 10;
-
-export const DIFFICULTY_0_MISSILE_BASE_MOVEMENT_DELAY = 350;
-export const DIFFICULTY_0_MISSILE_BASE_FIRING_DELAY = 400;
-export const DIFFICULTY_0_MISSILE_BASE_MISSILE_COUNT = 2;
-
-export const DIFFICULTY_0_MISSILE_MOVEMENT_DELAY = 200;
-export const DIFFICULTY_0_MISSILE_COUNT = 2;
-
-// difficulty 1
-export const DIFFICULTY_1_INVADER_COUNT = 2;
-export const DIFFICULTY_1_INVADER_SPAWN_INTERVAL = 1200;
-export const DIFFICULTY_1_INVADER_SPAWN_CHANCE = 0.15;
-export const DIFFICULTY_1_INVADER_LOWEST_STARTING_ROW = 2;
-export const DIFFICULTY_1_INVADER_FIRING_DELAY = 1500;
-export const DIFFICULTY_1_INVADER_MOVEMENT_DELAY = 1500;
-export const DIFFICULTY_1_INVADER_FIRING_CHANCE = 0.075;
-export const DIFFICULTY_1_INVADER_STEP_DOWN_CHANCE = 0.03;
-export const DIFFICULTY_1_INVADER_STEP_SIDEWAYS_CHANCE = 0.03;
-
-export const DIFFICULTY_1_DEATH_RAY_COUNT = 2;
-export const DIFFICULTY_1_DEATH_RAY_MOVEMENT_DELAY = 300;
-
-export const DIFFICULTY_1_BONUS_CHANCE = 0.0075;
-export const DIFFICULTY_1_BONUS_MOVEMENT_DELAY = 800;
-export const DIFFICULTY_1_BONUS_POINT_VALUE = 10;
-
-export const DIFFICULTY_1_MISSILE_BASE_MOVEMENT_DELAY = 350;
-export const DIFFICULTY_1_MISSILE_BASE_FIRING_DELAY = 400;
-export const DIFFICULTY_1_MISSILE_BASE_MISSILE_COUNT = 2;
-
-export const DIFFICULTY_1_MISSILE_MOVEMENT_DELAY = 200;
-export const DIFFICULTY_1_MISSILE_COUNT = 2;
-
-// difficulty 2
-export const DIFFICULTY_2_INVADER_COUNT = 2;
-export const DIFFICULTY_2_INVADER_SPAWN_INTERVAL = 900;
-export const DIFFICULTY_2_INVADER_SPAWN_CHANCE = 0.2;
-export const DIFFICULTY_2_INVADER_LOWEST_STARTING_ROW = 3;
-export const DIFFICULTY_2_INVADER_FIRING_DELAY = 1200;
-export const DIFFICULTY_2_INVADER_MOVEMENT_DELAY = 1200;
-export const DIFFICULTY_2_INVADER_FIRING_CHANCE = 0.1;
-export const DIFFICULTY_2_INVADER_STEP_DOWN_CHANCE = 0.05;
-export const DIFFICULTY_2_INVADER_STEP_SIDEWAYS_CHANCE = 0.05;
-
-export const DIFFICULTY_2_DEATH_RAY_COUNT = 2;
-export const DIFFICULTY_2_DEATH_RAY_MOVEMENT_DELAY = 200;
-
-export const DIFFICULTY_2_BONUS_CHANCE = 0.0075;
-export const DIFFICULTY_2_BONUS_MOVEMENT_DELAY = 600;
-export const DIFFICULTY_2_BONUS_POINT_VALUE = 10;
-
-export const DIFFICULTY_2_MISSILE_BASE_MOVEMENT_DELAY = 350;
-export const DIFFICULTY_2_MISSILE_BASE_FIRING_DELAY = 400;
-export const DIFFICULTY_2_MISSILE_BASE_MISSILE_COUNT = 2;
-
-export const DIFFICULTY_2_MISSILE_MOVEMENT_DELAY = 200;
-export const DIFFICULTY_2_MISSILE_COUNT = 2;
+let TextureCache = utils.TextureCache;
 
 export default class DifficultySetting extends VFDGameObject
 {
     public static instance: DifficultySetting;
     public onDifficultyChanged: Array<(difficultySetting:DifficultySetting, difficulty:number) => void> = new Array<(difficultySetting:DifficultySetting, difficulty:number) => void>();
+    indicatorSprite: Sprite;
+    indicatorTextureNames: Array<string>;
 
     private _currentDifficulty: number;
     private difficultyData: ReadonlyArray<DifficultyData> =
         [
             {
-                invaderCount: DIFFICULTY_0_INVADER_COUNT,
-                invaderLowestStartingRow: DIFFICULTY_0_INVADER_LOWEST_STARTING_ROW,
-                invaderSpawnInterval: DIFFICULTY_0_INVADER_SPAWN_INTERVAL,
-                invaderSpawnChance: DIFFICULTY_0_INVADER_SPAWN_CHANCE,
-                invaderMovementDelay: DIFFICULTY_0_INVADER_MOVEMENT_DELAY,
-                invaderFiringChance: DIFFICULTY_0_INVADER_FIRING_CHANCE,
-                invaderFiringDelay: DIFFICULTY_0_INVADER_FIRING_DELAY,
-                invaderStepDownChance: DIFFICULTY_0_INVADER_STEP_DOWN_CHANCE,
-                invaderStepSidewaysChance: DIFFICULTY_0_INVADER_STEP_SIDEWAYS_CHANCE,
+                invaderCount: DIFFICULTY.DIFFICULTY_0_INVADER_COUNT,
+                invaderLowestStartingRow: DIFFICULTY.DIFFICULTY_0_INVADER_LOWEST_STARTING_ROW,
+                invaderSpawnInterval: DIFFICULTY.DIFFICULTY_0_INVADER_SPAWN_INTERVAL,
+                invaderSpawnChance: DIFFICULTY.DIFFICULTY_0_INVADER_SPAWN_CHANCE,
+                invaderMovementDelay: DIFFICULTY.DIFFICULTY_0_INVADER_MOVEMENT_DELAY,
+                invaderFiringChance: DIFFICULTY.DIFFICULTY_0_INVADER_FIRING_CHANCE,
+                invaderFiringDelay: DIFFICULTY.DIFFICULTY_0_INVADER_FIRING_DELAY,
+                invaderStepDownChance: DIFFICULTY.DIFFICULTY_0_INVADER_STEP_DOWN_CHANCE,
+                invaderStepSidewaysChance: DIFFICULTY.DIFFICULTY_0_INVADER_STEP_SIDEWAYS_CHANCE,
 
-                deathRayCount: DIFFICULTY_0_DEATH_RAY_COUNT,
-                deathRayMovementDelay: DIFFICULTY_0_DEATH_RAY_MOVEMENT_DELAY,
+                deathRayCount: DIFFICULTY.DIFFICULTY_0_DEATH_RAY_COUNT,
+                deathRayMovementDelay: DIFFICULTY.DIFFICULTY_0_DEATH_RAY_MOVEMENT_DELAY,
 
-                bonusChance: DIFFICULTY_0_BONUS_CHANCE,
-                bonusMovementDelay: DIFFICULTY_0_BONUS_MOVEMENT_DELAY,
-                bonusPointValue: DIFFICULTY_0_BONUS_POINT_VALUE,
+                bonusChance: DIFFICULTY.DIFFICULTY_0_BONUS_CHANCE,
+                bonusMovementDelay: DIFFICULTY.DIFFICULTY_0_BONUS_MOVEMENT_DELAY,
+                bonusPointValue: DIFFICULTY.DIFFICULTY_0_BONUS_POINT_VALUE,
 
-                missileCount: DIFFICULTY_0_MISSILE_COUNT,
-                missileMovementDelay: DIFFICULTY_0_MISSILE_MOVEMENT_DELAY,
-                missileBaseFiringDelay: DIFFICULTY_0_MISSILE_BASE_FIRING_DELAY,
-                missileBaseMovementDelay: DIFFICULTY_0_MISSILE_BASE_MOVEMENT_DELAY
+                missileCount: DIFFICULTY.DIFFICULTY_0_MISSILE_COUNT,
+                missileMovementDelay: DIFFICULTY.DIFFICULTY_0_MISSILE_MOVEMENT_DELAY,
+                missileBaseFiringDelay: DIFFICULTY.DIFFICULTY_0_MISSILE_BASE_FIRING_DELAY,
+                missileBaseMovementDelay: DIFFICULTY.DIFFICULTY_0_MISSILE_BASE_MOVEMENT_DELAY
             },
             {
-                invaderCount: DIFFICULTY_1_INVADER_COUNT,
-                invaderLowestStartingRow: DIFFICULTY_1_INVADER_LOWEST_STARTING_ROW,
-                invaderSpawnInterval: DIFFICULTY_1_INVADER_SPAWN_INTERVAL,
-                invaderSpawnChance: DIFFICULTY_1_INVADER_SPAWN_CHANCE,
-                invaderMovementDelay: DIFFICULTY_1_INVADER_MOVEMENT_DELAY,
-                invaderFiringChance: DIFFICULTY_1_INVADER_FIRING_CHANCE,
-                invaderFiringDelay: DIFFICULTY_1_INVADER_FIRING_DELAY,
-                invaderStepDownChance: DIFFICULTY_1_INVADER_STEP_DOWN_CHANCE,
-                invaderStepSidewaysChance: DIFFICULTY_1_INVADER_STEP_SIDEWAYS_CHANCE,
+                invaderCount: DIFFICULTY.DIFFICULTY_1_INVADER_COUNT,
+                invaderLowestStartingRow: DIFFICULTY.DIFFICULTY_1_INVADER_LOWEST_STARTING_ROW,
+                invaderSpawnInterval: DIFFICULTY.DIFFICULTY_1_INVADER_SPAWN_INTERVAL,
+                invaderSpawnChance: DIFFICULTY.DIFFICULTY_1_INVADER_SPAWN_CHANCE,
+                invaderMovementDelay: DIFFICULTY.DIFFICULTY_1_INVADER_MOVEMENT_DELAY,
+                invaderFiringChance: DIFFICULTY.DIFFICULTY_1_INVADER_FIRING_CHANCE,
+                invaderFiringDelay: DIFFICULTY.DIFFICULTY_1_INVADER_FIRING_DELAY,
+                invaderStepDownChance: DIFFICULTY.DIFFICULTY_1_INVADER_STEP_DOWN_CHANCE,
+                invaderStepSidewaysChance: DIFFICULTY.DIFFICULTY_1_INVADER_STEP_SIDEWAYS_CHANCE,
 
-                deathRayCount: DIFFICULTY_1_DEATH_RAY_COUNT,
-                deathRayMovementDelay: DIFFICULTY_1_DEATH_RAY_MOVEMENT_DELAY,
+                deathRayCount: DIFFICULTY.DIFFICULTY_1_DEATH_RAY_COUNT,
+                deathRayMovementDelay: DIFFICULTY.DIFFICULTY_1_DEATH_RAY_MOVEMENT_DELAY,
 
-                bonusChance: DIFFICULTY_1_BONUS_CHANCE,
-                bonusMovementDelay: DIFFICULTY_1_BONUS_MOVEMENT_DELAY,
-                bonusPointValue: DIFFICULTY_1_BONUS_POINT_VALUE,
+                bonusChance: DIFFICULTY.DIFFICULTY_1_BONUS_CHANCE,
+                bonusMovementDelay: DIFFICULTY.DIFFICULTY_1_BONUS_MOVEMENT_DELAY,
+                bonusPointValue: DIFFICULTY.DIFFICULTY_1_BONUS_POINT_VALUE,
 
-                missileCount: DIFFICULTY_1_MISSILE_COUNT,
-                missileMovementDelay: DIFFICULTY_1_MISSILE_MOVEMENT_DELAY,
-                missileBaseFiringDelay: DIFFICULTY_1_MISSILE_BASE_FIRING_DELAY,
-                missileBaseMovementDelay: DIFFICULTY_1_MISSILE_BASE_MOVEMENT_DELAY
+                missileCount: DIFFICULTY.DIFFICULTY_1_MISSILE_COUNT,
+                missileMovementDelay: DIFFICULTY.DIFFICULTY_1_MISSILE_MOVEMENT_DELAY,
+                missileBaseFiringDelay: DIFFICULTY.DIFFICULTY_1_MISSILE_BASE_FIRING_DELAY,
+                missileBaseMovementDelay: DIFFICULTY.DIFFICULTY_1_MISSILE_BASE_MOVEMENT_DELAY
             },
             {
-                invaderCount: DIFFICULTY_2_INVADER_COUNT,
-                invaderLowestStartingRow: DIFFICULTY_2_INVADER_LOWEST_STARTING_ROW,
-                invaderSpawnInterval: DIFFICULTY_2_INVADER_SPAWN_INTERVAL,
-                invaderSpawnChance: DIFFICULTY_2_INVADER_SPAWN_CHANCE,
-                invaderMovementDelay: DIFFICULTY_2_INVADER_MOVEMENT_DELAY,
-                invaderFiringChance: DIFFICULTY_2_INVADER_FIRING_CHANCE,
-                invaderFiringDelay: DIFFICULTY_2_INVADER_FIRING_DELAY,
-                invaderStepDownChance: DIFFICULTY_2_INVADER_STEP_DOWN_CHANCE,
-                invaderStepSidewaysChance: DIFFICULTY_2_INVADER_STEP_SIDEWAYS_CHANCE,
+                invaderCount: DIFFICULTY.DIFFICULTY_2_INVADER_COUNT,
+                invaderLowestStartingRow: DIFFICULTY.DIFFICULTY_2_INVADER_LOWEST_STARTING_ROW,
+                invaderSpawnInterval: DIFFICULTY.DIFFICULTY_2_INVADER_SPAWN_INTERVAL,
+                invaderSpawnChance: DIFFICULTY.DIFFICULTY_2_INVADER_SPAWN_CHANCE,
+                invaderMovementDelay: DIFFICULTY.DIFFICULTY_2_INVADER_MOVEMENT_DELAY,
+                invaderFiringChance: DIFFICULTY.DIFFICULTY_2_INVADER_FIRING_CHANCE,
+                invaderFiringDelay: DIFFICULTY.DIFFICULTY_2_INVADER_FIRING_DELAY,
+                invaderStepDownChance: DIFFICULTY.DIFFICULTY_2_INVADER_STEP_DOWN_CHANCE,
+                invaderStepSidewaysChance: DIFFICULTY.DIFFICULTY_2_INVADER_STEP_SIDEWAYS_CHANCE,
 
-                deathRayCount: DIFFICULTY_2_DEATH_RAY_COUNT,
-                deathRayMovementDelay: DIFFICULTY_2_DEATH_RAY_MOVEMENT_DELAY,
+                deathRayCount: DIFFICULTY.DIFFICULTY_2_DEATH_RAY_COUNT,
+                deathRayMovementDelay: DIFFICULTY.DIFFICULTY_2_DEATH_RAY_MOVEMENT_DELAY,
 
-                bonusChance: DIFFICULTY_2_BONUS_CHANCE,
-                bonusMovementDelay: DIFFICULTY_2_BONUS_MOVEMENT_DELAY,
-                bonusPointValue: DIFFICULTY_2_BONUS_POINT_VALUE,
+                bonusChance: DIFFICULTY.DIFFICULTY_2_BONUS_CHANCE,
+                bonusMovementDelay: DIFFICULTY.DIFFICULTY_2_BONUS_MOVEMENT_DELAY,
+                bonusPointValue: DIFFICULTY.DIFFICULTY_2_BONUS_POINT_VALUE,
 
-                missileCount: DIFFICULTY_2_MISSILE_COUNT,
-                missileMovementDelay: DIFFICULTY_2_MISSILE_MOVEMENT_DELAY,
-                missileBaseFiringDelay: DIFFICULTY_2_MISSILE_BASE_FIRING_DELAY,
-                missileBaseMovementDelay: DIFFICULTY_2_MISSILE_BASE_MOVEMENT_DELAY
+                missileCount: DIFFICULTY.DIFFICULTY_2_MISSILE_COUNT,
+                missileMovementDelay: DIFFICULTY.DIFFICULTY_2_MISSILE_MOVEMENT_DELAY,
+                missileBaseFiringDelay: DIFFICULTY.DIFFICULTY_2_MISSILE_BASE_FIRING_DELAY,
+                missileBaseMovementDelay: DIFFICULTY.DIFFICULTY_2_MISSILE_BASE_MOVEMENT_DELAY
             }
         ];
 
     public init()
     {
         DifficultySetting.instance = this;
+        this.indicatorTextureNames = [TEXTURE_DIFFICULTY_INDICATOR_00, TEXTURE_DIFFICULTY_INDICATOR_01, TEXTURE_DIFFICULTY_INDICATOR_02];
+
+        this.indicatorSprite = new Sprite(TextureCache[this.indicatorTextureNames[0]]);
+        this.container.addChild(this.indicatorSprite);
+        this.container.x = DIFFICULTY_INDICATOR_X_OFFSET;
+        this.container.y = DIFFICULTY_INDICATOR_Y_OFFSET;
+
     }
 
     public reset()
     {
-        this._currentDifficulty = 0;
+        this.currentDifficulty = 0;
     }
 
     get currentDifficulty(): number
@@ -175,8 +130,14 @@ export default class DifficultySetting extends VFDGameObject
 
     set currentDifficulty(value: number)
     {
+        if (value==this._currentDifficulty)
+        {
+            return;
+        }
+
         value = Clamp.between(value, DIFFICULTY_MIN, DIFFICULTY_MAX);
         this._currentDifficulty = value;
+        this.changeTexturesForDifficulty(value);
         this.dispatchOnDifficultyChanged();
         // TODO send a network event
     }
@@ -194,4 +155,17 @@ export default class DifficultySetting extends VFDGameObject
         }
 
     }
+
+    private changeTexturesForDifficulty(difficulty: number)
+    {
+        Validation.range(difficulty, DIFFICULTY_MIN, DIFFICULTY_MAX);
+        // if ((difficulty < DIFFICULTY_MIN) || (difficulty > DIFFICULTY_MAX))
+        // {
+        //     return;
+        // }
+
+        this.indicatorSprite.texture = TextureCache[this.indicatorTextureNames[difficulty]];
+    }
+
+
 }

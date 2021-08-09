@@ -1,9 +1,3 @@
-export const BONUS_COL_STEP = 148;
-export const BONUS_COL_OFFSET = 74;
-export const BONUS_ROW_OFFSET = 92;
-export const BONUS_EXPLOSION_ROW_OFFSET = 52;
-
-
 export const RIGHT_COLUMN = 2;
 export const LEFT_COLUMN = 0;
 export const CENTER_COLUMN = 1;
@@ -12,9 +6,12 @@ export const TOP_ROW = 0;
 export const BOTTOM_ROW = 6;
 export const DEFAULT_MOVEMENT_DELAY = 100;
 export const DEFAULT_DEATH_DELAY = 400;
-export const GAME_SCALE = 0.3;
+export const GAME_SCALE = 1;
+
 export const DIFFICULTY_MAX = 2;
 export const DIFFICULTY_MIN = 0;
+export const DIFFICULTY_INDICATOR_X_OFFSET = 100;
+export const DIFFICULTY_INDICATOR_Y_OFFSET = 100;
 
 // recognized keycodes
 export const KEY_CODE_MOVE_LEFT: number = 90; // Z
@@ -36,12 +33,17 @@ export const ACTION_DIFFICULTY_1 = 1 << 6;
 export const ACTION_DIFFICULTY_2 = 1 << 7;
 export const ACTION_DIFFICULTY_3 = 1 << 8;
 
+export const BONUS_COL_STEP = 146;
+export const BONUS_COL_OFFSET = 78;
+export const BONUS_ROW_OFFSET = 92;
+export const BONUS_HIT_Y_OFFSET = 50;
+
 export const INVADER_COL_STEP = 144;
-export const INVADER_COL_OFFSET = 10;
+export const INVADER_COL_OFFSET = 12;
 export const INVADER_ROW_STEP = 198;
-export const INVADER_ROW_OFFSET = 88;
-export const INVADER_EXPLOSION_OFFSET_X = 6;
-export const INVADER_EXPLOSION_OFFSET_Y = 100;
+export const INVADER_ROW_OFFSET = 90;
+export const INVADER_HIT_OFFSET_X = 6;
+export const INVADER_HIT_OFFSET_Y = 100;
 export const INVADER_HIGHEST_ROW = 1;
 export const INVADER_POINT_VALUE_ROW_1 = 3;
 export const INVADER_POINT_VALUE_ROW_2 = 2;
@@ -49,29 +51,30 @@ export const INVADER_POINT_VALUE_ROW_3 = 1;
 export const INVADER_POINT_VALUE_ROW_4 = 1;
 export const INVADER_POINT_VALUE_ROW_5 = 1;
 
-export const DEATH_RAY_ROW_OFFSET = 158;
+export const DEATH_RAY_ROW_OFFSET = 163;
 export const DEATH_RAY_ROW_STEP = 198;
-export const DEATH_RAY_COL_OFFSET = 76;
+export const DEATH_RAY_COL_OFFSET = 77;
 export const DEATH_RAY_COL_STEP = 144;
 
 export const MAX_LIVES = 3;
-export const LIVES_INDICATOR_X_OFFSET = 8;
+export const LIVES_INDICATOR_X_OFFSET = 13;
 export const LIVES_INDICATOR_X_STEP = 145;
 export const LIVES_INDICATOR_Y_OFFSET = 1488;
 
-export const MISSILE_BASE_COL_OFFSET = 72;
-export const MISSILE_BASE_COL_STEP = 148;
-export const MISSILE_BASE_ROW_OFFSET = 1362;
-
+export const MISSILE_BASE_COL_OFFSET = 77;
+export const MISSILE_BASE_COL_STEP = 144;
+export const MISSILE_BASE_ROW_OFFSET = 1460;
+export const MISSILE_BASE_HIT_X_OFFSET=0;
+export const MISSILE_BASE_HIT_Y_OFFSET=-4;
 
 export const MISSILE_ROW_OFFSET = 270;
 export const MISSILE_ROW_STEP = 198;
-export const MISSILE_COL_OFFSET = 76;
+export const MISSILE_COL_OFFSET = 77;
 export const MISSILE_COL_STEP = 144;
 
 export const MAX_POINTS: number = 199;
-export const SCOREBOARD_OFFSET_X = 190;
-export const SCOREBOARD_OFFSET_Y = 4;
+export const SCOREBOARD_OFFSET_X = 192;
+export const SCOREBOARD_OFFSET_Y = 7;
 export const SCOREBOARD_STEP_X = 54;
 
 export const SOCKET_UPDATE = 'update';
@@ -121,9 +124,13 @@ export const TEXTURE_DIGIT_07 = 'digit-07';
 export const TEXTURE_DIGIT_08 = 'digit-08';
 export const TEXTURE_DIGIT_09 = 'digit-09';
 export const TEXTURE_VFD_PLAYFIELD = 'vfd-playfield';
+export const TEXTURE_DIFFICULTY_INDICATOR_00 = 'difficulty-00';
+export const TEXTURE_DIFFICULTY_INDICATOR_01 = 'difficulty-01';
+export const TEXTURE_DIFFICULTY_INDICATOR_02 = 'difficulty-02';
 
 export const COLLISION_MISSILE_BASE = 1 << 0;
 export const COLLISION_MISSILE = 1 << 1;
 export const COLLISION_DEATH_RAY = 1 << 2;
 export const COLLISION_INVADER = 1 << 3;
 export const COLLISION_BONUS = 1 << 4;
+

@@ -217,25 +217,27 @@ export default class PlayfieldGameObject extends VFDGameObject
     }
 
 
-    public moveLeftIfCan()
+    public moveLeftIfCan():boolean
     {
         if (!this.canMoveLeft)
         {
-            return;
+            return false;
         }
 
         this.moveLeft();
+        return true;
 
     }
 
-    public moveRightIfCan()
+    public moveRightIfCan() :boolean
     {
         if (!this.canMoveRight)
         {
-            return;
+            return false;
         }
 
         this.moveRight();
+        return true;
     }
 
     public moveLeft()
@@ -252,14 +254,15 @@ export default class PlayfieldGameObject extends VFDGameObject
         // TODO send network event
     }
 
-    public moveUpIfCan()
+    public moveUpIfCan():boolean
     {
         if (!this.canMoveUp)
         {
-            return;
+            return false;
         }
 
         this.moveUp();
+        return true;
     }
 
     public moveUp()
@@ -269,14 +272,15 @@ export default class PlayfieldGameObject extends VFDGameObject
         // TODO send network event
     }
 
-    public moveDownIfCan()
+    public moveDownIfCan():boolean
     {
         if (!this.canMoveDown)
         {
-            return;
+            return false;
         }
 
         this.moveDown();
+        return true;
     }
 
     public moveDown()
