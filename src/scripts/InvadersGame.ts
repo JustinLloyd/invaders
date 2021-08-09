@@ -191,7 +191,7 @@ class InvadersGame extends PlayfieldGameWorld
         {
             if (go instanceof VFDGameObject)
             {
-                (go as VFDGameObject).pulse();
+                (go as VFDGameObject).flicker();
             }
         }
     }
@@ -202,7 +202,7 @@ class InvadersGame extends PlayfieldGameWorld
         {
             if (go instanceof VFDGameObject)
             {
-                (go as VFDGameObject).flicker();
+                (go as VFDGameObject).fastblink();
             }
         }
     }

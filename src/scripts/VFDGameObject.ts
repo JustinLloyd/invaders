@@ -26,11 +26,11 @@ export default class VFDGameObject extends GameObject
 
         go.container.filters = [VFDGameObject.blurFilter, VFDGameObject.glowFilter];
 
-        (go as unknown as VFDGameObject).pulse();
+        (go as unknown as VFDGameObject).flicker();
         return (go);
     }
 
-    public pulse()
+    public flicker()
     {
         if (this.flickerTween != null)
         {
@@ -47,7 +47,7 @@ export default class VFDGameObject extends GameObject
         }
     }
 
-    public flicker()
+    public fastblink()
     {
         if (this.pulseTween != null)
         {
@@ -55,7 +55,7 @@ export default class VFDGameObject extends GameObject
         }
         if (this.flickerTween == null)
         {
-            this.flickerTween = gsap.to(this.container, 0.05, {yoyo: true, repeat: -1, pixi: {alpha: .10}});
+            this.flickerTween = gsap.to(this.container, 0.1, {yoyo: true, repeat: -1, pixi: {alpha: .10}});
         }
         else
         {
