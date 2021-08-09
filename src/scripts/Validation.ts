@@ -32,7 +32,12 @@ export default class Validation
 
     public static range(value: number, lowerBound: number, upperBound: number)
     {
-        if (value > lowerBound)
+        if (value >= lowerBound)
+        {
+            return;
+        }
+
+        if (value <= upperBound)
         {
             return;
         }

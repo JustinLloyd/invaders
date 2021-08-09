@@ -1,6 +1,6 @@
 export default class Component
 {
-    public onDestroyed: Array<(Component) => void> = new Array<(Component) => void>();
+    public onDestroyed: Array<(component: Component) => void> = new Array<(component: Component) => void>();
 
     public _init()
     {

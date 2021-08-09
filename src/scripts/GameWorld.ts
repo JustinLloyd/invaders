@@ -1,11 +1,17 @@
 import * as PIXI from 'pixi.js';
 import * as $ from "jquery";
+import "gsap";
+import {PixiPlugin}  from "gsap/PixiPlugin";
 import GameObject from "./GameObject";
 import InputSystem from "./InputSystem";
 import Component from "./Component";
 import {GAME_SCALE} from "./Constants";
 
 let loader = PIXI.Loader.shared;
+
+// prevent tree shaking in production builds (not sure if needed)
+//const plugins = [PixiPlugin];
+
 
 export default abstract class GameWorld
 {
@@ -37,11 +43,9 @@ export default abstract class GameWorld
 
     initLibraries()
     {
-        if (PIXI.utils.isWebGLSupported())
-        {
-            console.log("WebGL is supported")
-        }
         GameWorld.app = new PIXI.Application({width: 1200, height: 1700, autoStart: false, sharedLoader: true});
+        PixiPlugin.registerPIXI(PIXI);
+
         GameWorld.app.ticker.maxFPS = 30;
         GameWorld.app.stage.scale.set(GAME_SCALE);
         // GameWorld.app.view.style.width="200px";
@@ -53,13 +57,11 @@ export default abstract class GameWorld
 
     private onAssetsLoaded()
     {
-        console.log("Assets have been loaded")
         this.init();
         this.reset();
         this.start();
         GameWorld.app.ticker.add(secondsPassed => this.tick(secondsPassed));
         GameWorld.app.start();
-        console.log(GameWorld.instance.gameObjects.length);
     }
 
 

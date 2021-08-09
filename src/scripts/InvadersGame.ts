@@ -1,5 +1,4 @@
 import * as $ from "jquery";
-import "gsap";
 import * as PIXI from 'pixi.js';
 import GameObject from "./GameObject";
 import Invader from "./Invader";
@@ -15,7 +14,7 @@ import GameObjectPool from "./GameObjectPool";
 import Playfield from "./Playfield";
 import DebugInfo from "./DebugInfo";
 import {
-    BOTTOM_ROW, INVADER_HIGHEST_ROW,
+    BOTTOM_ROW, COLUMN_COUNT, INVADER_HIGHEST_ROW,
     LEFT_COLUMN, MAX_LIVES,
     MAX_POINTS, RIGHT_COLUMN,
     TEXTURE_BONUS_01,
@@ -46,10 +45,10 @@ import {
     TEXTURE_VFD_PLAYFIELD, TOP_ROW
 } from "./Constants";
 import PlayfieldGameWorld from "./PlayfieldGameWorld";
-import InvaderController from "./InvaderController";
+import InvaderSpawner from "./InvaderSpawner";
 import BonusController from "./BonusController";
 import MissileBaseController from "./PlayerController";
-import {EventDispatch} from './EventDispatch';
+import VFDGameObject from './VFDGameObject';
 
 let invader_01 = require('url:../assets/invader-01.png');
 let invader_02 = require('url:../assets/invader-02.png');
@@ -126,13 +125,13 @@ class InvadersGame extends PlayfieldGameWorld
     scoreboard: Scoreboard;
     livesIndicator: LivesIndicator;
     playfield: Playfield;
-    invaderController: InvaderController;
+    invaderController: InvaderSpawner;
     gameState: GameState;
     private missileBaseController: MissileBaseController;
     private bonusController: BonusController;
- //dispatchTest:EventDispatch<(lives:number) => void> = new EventDispatch<(lives:number) => void>();
- //    public dispatchTest: Array<() => void> = new Array<() => void>() ;
- //    public dispatchTest2: (() => void)[] = [];
+    //dispatchTest:EventDispatch<(lives:number) => void> = new EventDispatch<(lives:number) => void>();
+    //    public dispatchTest: Array<() => void> = new Array<() => void>() ;
+    //    public dispatchTest2: (() => void)[] = [];
 
     init()
     {
@@ -143,9 +142,69 @@ class InvadersGame extends PlayfieldGameWorld
         this.createWorld();
     }
 
-    public callbackTest()
+    public start()
     {
-        console.log("Callback test invoked")
+        this.missileBaseController.missileBase.onExitPlayfield.push((missileBase) => this.onPlayerKilled(missileBase));
+        this.livesIndicator.onOutOfLives.push((livesIndicator: LivesIndicator) => this.onOutOfLives(livesIndicator));
+        this.scoreboard.onPointsUpdated.push((scoreboard: Scoreboard, points: number) => this.onPointsUpdated(scoreboard, points));
+        this.scoreboard.onMaximumPointsAchieved.push((scoreboard: Scoreboard, points: number) => this.onMaximumPoints(scoreboard, points));
+        this.bonusController.bonus.onDead.push((bonus) => this.scoreboard.addPoints(bonus.pointValue));
+        this.invaderController.invadersPool.forEach(value => value.onDead.push(this.onInvaderKilled.bind(this)));
+        this.invaderController.invadersPool.forEach(value => value.onLanded.push(this.onInvaderLanded.bind(this)));
+    }
+
+    private restartMission()
+    {
+        this.missileBaseController.restartMission();
+        this.invaderController.restartMission();
+        this.bonusController.restartMission();
+    }
+
+    public onPlayerKilled(missileBase: MissileBase)
+    {
+        this.livesIndicator.deductLife();
+        if (this.gameState == GameState.PlayerLost)
+        {
+            return;
+        }
+        this.restartMission();
+    }
+
+    public resetGame()
+    {
+        this.makeVFDObjectsPulse();
+        this.gameState = GameState.Playing;
+        this.livesIndicator.reset();
+
+        this.scoreboard.reset();
+        this.invaderController.reset();
+        this.invaderController.restartMission();
+        this.bonusController.reset();
+        this.bonusController.restartMission();
+        this.missileBaseController.reset();
+        this.missileBaseController.restartMission();
+    }
+
+    public makeVFDObjectsPulse()
+    {
+        for (let go of this.gameObjects)
+        {
+            if (go instanceof VFDGameObject)
+            {
+                (go as VFDGameObject).pulse();
+            }
+        }
+    }
+
+    public makeVFDObjectsFlicker()
+    {
+        for (let go of this.gameObjects)
+        {
+            if (go instanceof VFDGameObject)
+            {
+                (go as VFDGameObject).flicker();
+            }
+        }
     }
 
 
@@ -165,26 +224,21 @@ class InvadersGame extends PlayfieldGameWorld
         //this.deathRaysPool.forEach(value => value.reset());
     }
 
-    public onOutOfLives()
+    public onOutOfLives(livesIndicator: LivesIndicator): void
     {
         this.gameState = GameState.PlayerLost;
-        this.invaderController.enabled = false;
-        this.bonusController.enabled = false;
-        this.missileBaseController.enabled = false;
+        this.shutdownGame();
     }
 
-    public onPointsUpdated(points: number)
+    public onPointsUpdated(scoreboard: Scoreboard, points: number): void
     {
-        console.log("Points updated");
+        // do nothing
     }
 
-    public onMaximumPoints(points: number)
+    public onMaximumPoints(scoreboard: Scoreboard, points: number): void
     {
-        console.log("Maximum points reached");
         this.gameState = GameState.PlayerWon;
-        this.invaderController.enabled = false;
-        this.bonusController.enabled = false;
-        this.missileBaseController.enabled = false;
+        this.shutdownGame();
     }
 
     public createWorld()
@@ -193,27 +247,21 @@ class InvadersGame extends PlayfieldGameWorld
         this.difficulty = new DifficultySetting();
 
         // player lives setup
-        this.livesIndicator = GameObject.createGameObject(LivesIndicator);
+        this.livesIndicator = VFDGameObject.createGameObject(LivesIndicator);
         this.livesIndicator.maximumLives = MAX_LIVES;
-        this.livesIndicator.onOutOfLives.push(()=>this.onOutOfLives);
 
         // scoreboard setup
-        this.scoreboard = GameObject.createGameObject(Scoreboard);
+        this.scoreboard = VFDGameObject.createGameObject(Scoreboard);
         this.scoreboard.maximumPoints = MAX_POINTS;
-        this.scoreboard.onPointsUpdated.push( (points) => this.onPointsUpdated(points));
-        this.scoreboard.onMaximumPointsAchieved.push( (points) => this.onMaximumPoints(points));
 
         // bonus setup
         this.bonusController = GameObject.createGameObject(BonusController);
-        this.bonusController.bonus.onDead.push( (bonus) => this.scoreboard.addPoints(bonus.pointValue));
 
         // missile base setup
         this.missileBaseController = GameObject.createGameObject(MissileBaseController);
 
         // invaders setup
-        this.invaderController = GameObject.createGameObject(InvaderController);
-        this.invaderController.invadersPool.forEach(value => value.onDead.push(this.onInvaderKilled));
-        this.invaderController.invadersPool.forEach(value => value.onLanded.push(this.onInvaderLanded));
+        this.invaderController = GameObject.createGameObject(InvaderSpawner);
 
         // TODO if the number of death rays on the new difficulty is different than previously, then adjust the pool
         if (this.isDebug)
@@ -228,22 +276,10 @@ class InvadersGame extends PlayfieldGameWorld
         return (this.gameState == GameState.PlayerWon || this.gameState == GameState.PlayerLost);
     }
 
-    public onPlayerKilled()
-    {
-        this.livesIndicator.deductLife();
-        if (this.livesIndicator.lives == 0)
-        {
-            this.gameState = GameState.PlayerLost;
-        }
-    }
-
     public onInvaderLanded(invader: Invader)
     {
         this.gameState = GameState.PlayerLost;
-        this.invaderController.enabled = false;
-        this.bonusController.enabled = false;
-        this.missileBaseController.enabled = false;
-
+        this.shutdownGame();
     }
 
     public onInvaderKilled(invader: Invader)
@@ -255,26 +291,10 @@ class InvadersGame extends PlayfieldGameWorld
     {
         if (this.inputSystem.isDownReset())
         {
-            console.log("Reset");
-            this.reset();
+            this.resetGame();
             return;
         }
 
-        if (this.isGameFinished)
-        {
-            GameWorld.app.stage.visible = !GameWorld.app.stage.visible;
-            return;
-        }
-
-        // TODO determine if we should launch an invader here
-        // determine if we should launch a bonus spaceship
-
-        // TODO determine if the bonus spaceship hass been hit by a player missile
-
-        // TODO determine if an invader has been hit by a player missile
-        // TODO determine if an invader missile has hit the player
-        // TODO determine if the invaders have landed here
-        // TODO determine if the game is over when the player runs out of life here
     }
 
     public loadAssets()
@@ -320,74 +340,90 @@ class InvadersGame extends PlayfieldGameWorld
 
     private ValidateSpritePlacements()
     {
-        for (let x = LEFT_COLUMN; x < RIGHT_COLUMN; x++)
+        for (let x = LEFT_COLUMN; x < COLUMN_COUNT; x++)
         {
-            for (let y = INVADER_HIGHEST_ROW; y < BOTTOM_ROW; y++)
+            for (let y = INVADER_HIGHEST_ROW; y <= BOTTOM_ROW; y++)
             {
                 let go = GameObject.createGameObject(Invader);
                 go.row = y;
                 go.col = x;
+                go.enabled = false;
             }
         }
 
-        for (let x = LEFT_COLUMN; x < RIGHT_COLUMN; x++)
+        for (let x = LEFT_COLUMN; x < COLUMN_COUNT; x++)
         {
             for (let y = INVADER_HIGHEST_ROW; y < BOTTOM_ROW; y++)
             {
                 let go = GameObject.createGameObject(Invader);
                 go.col = x;
-                go.die();
                 go.row = y;
+                go.showDead();
+                go.enabled = false;
             }
         }
-        for (let x = LEFT_COLUMN; x < RIGHT_COLUMN; x++)
+        for (let x = LEFT_COLUMN; x < COLUMN_COUNT; x++)
         {
             for (let y = TOP_ROW; y < BOTTOM_ROW; y++)
             {
                 let go = GameObject.createGameObject(Missile);
                 go.row = y;
                 go.col = x;
+                go.enabled = false;
             }
         }
 
         GameObject.createGameObject(DebugInfo);
 
-        for (let x = LEFT_COLUMN; x < RIGHT_COLUMN; x++)
+        for (let x = LEFT_COLUMN; x < COLUMN_COUNT; x++)
         {
-            for (let y = INVADER_HIGHEST_ROW; y < 5; y++)
+            for (let y = INVADER_HIGHEST_ROW; y < BOTTOM_ROW; y++)
             {
                 let go = GameObject.createGameObject(DeathRay);
                 go.col = x;
                 go.row = y;
+                go.enabled = false;
             }
         }
 
-        for (let x = LEFT_COLUMN; x < RIGHT_COLUMN; x++)
+        for (let x = LEFT_COLUMN; x < COLUMN_COUNT; x++)
         {
             let go = GameObject.createGameObject(Bonus);
             go.col = x;
+            go.enabled = false;
         }
 
-        for (let x = LEFT_COLUMN; x < RIGHT_COLUMN; x++)
+        for (let x = LEFT_COLUMN; x < COLUMN_COUNT; x++)
         {
             let go = GameObject.createGameObject(Bonus);
-            go.die();
             go.col = x;
+            go.die();
+            go.enabled = false;
         }
 
-        for (let x = LEFT_COLUMN; x < RIGHT_COLUMN; x++)
+        for (let x = LEFT_COLUMN; x < COLUMN_COUNT; x++)
         {
             let go = GameObject.createGameObject(MissileBase);
             go.col = x;
+            go.enabled = false;
         }
 
-        for (let x = LEFT_COLUMN; x < RIGHT_COLUMN; x++)
+        for (let x = LEFT_COLUMN; x < COLUMN_COUNT; x++)
         {
             let go = GameObject.createGameObject(MissileBase);
             go.col = x;
             go.die();
+            go.enabled = false;
         }
 
+    }
+
+    private shutdownGame()
+    {
+        this.invaderController.shutdownGame();
+        this.bonusController.shutdownGame();
+        this.missileBaseController.shutdownGame();
+        this.makeVFDObjectsFlicker();
     }
 }
 

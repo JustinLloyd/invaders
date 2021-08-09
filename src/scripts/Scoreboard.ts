@@ -26,9 +26,9 @@ export default class Scoreboard extends VFDGameObject
     protected _points: number;
     private digitSprites: Array<Sprite>;
     private digitTextures: Array<string>;
-    public onPointsUpdated?: Array<(points: number) => void> = new Array<(points: number) => void>();
-    public onMaximumPointsAchieved: Array<(points: number) => void> = new Array<(points: number) => void>();
-    public onMaximumPointsUpdated: Array<(points: number) => void> = new Array<(points: number) => void>();
+    public onPointsUpdated?: Array<(scoreboard:Scoreboard, points: number) => void> = new Array<(scoreboard:Scoreboard, points: number) => void>();
+    public onMaximumPointsAchieved: Array<(scoreboard:Scoreboard, points: number) => void> = new Array<(scoreboard:Scoreboard, points: number) => void>();
+    public onMaximumPointsUpdated: Array<(scoreboard:Scoreboard, points: number) => void> = new Array<(scoreboard:Scoreboard, points: number) => void>();
     protected _maximumPoints: number;
 
     init()
@@ -76,7 +76,6 @@ export default class Scoreboard extends VFDGameObject
         this.dispatchOnPointsUpdated(this._points);
         if (this._points >= this._maximumPoints)
         {
-            console.log("On maximum points reached, dispatching maximum pointsevent");
             this.dispatchOnMaximumPointsAchieved(this._points);
         }
     }
@@ -130,7 +129,7 @@ export default class Scoreboard extends VFDGameObject
     {
         for (let callback of this.onPointsUpdated)
         {
-            callback(points);
+            callback(this, points);
         }
     }
 
@@ -138,7 +137,7 @@ export default class Scoreboard extends VFDGameObject
     {
         for (let callback of this.onMaximumPointsAchieved)
         {
-            callback(points);
+            callback(this, points);
         }
     }
 
@@ -146,7 +145,7 @@ export default class Scoreboard extends VFDGameObject
     {
         for (let callback of this.onMaximumPointsUpdated)
         {
-            callback(this._maximumPoints);
+            callback(this, this._maximumPoints);
         }
     }
 }

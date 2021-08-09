@@ -1,4 +1,5 @@
 import Validation from "./Validation";
+import {MovementDirection} from './Enums';
 
 export default class Random
 {
@@ -64,5 +65,16 @@ export default class Random
     public static boolean(): boolean
     {
         return (this.next() >= 0.5);
+    }
+
+    public static leftToRightOrRightToLeft():MovementDirection
+    {
+        return (Random.boolean() ? MovementDirection.LeftToRight : MovementDirection.RightToLeft)
+    }
+
+    public static leftOrRight():MovementDirection
+    {
+        return (Random.boolean() ? MovementDirection.Left : MovementDirection.Right)
+
     }
 }

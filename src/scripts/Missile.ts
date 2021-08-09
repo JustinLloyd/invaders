@@ -28,7 +28,6 @@ export default class Missile extends PlayfieldGameObject
         this.colOffset = MISSILE_COL_OFFSET;
         this.colStep = MISSILE_COL_STEP;
         this.isLockedToPlayfield = false;
-        this.movement.delay = DifficultySetting.difficulty.missileMovementDelay;
         this.missileSprite = new Sprite(TextureCache[TEXTURE_MISSILE]);
         this.missileSprite.anchor.set(0.5, 1);
         this.container.addChild(this.missileSprite);
@@ -38,32 +37,29 @@ export default class Missile extends PlayfieldGameObject
         this.collisionMask = COLLISION_INVADER | COLLISION_BONUS;
     }
 
-    reset()
+    public shutdownGame()
     {
-        this.movement.reset();
-        this.row = BOTTOM_ROW;
-    }
-
-    public get canMove(): boolean
-    {
-        return (this.canMoveUp && this.movement.hasElapsed);
+        this.enabled = false;
+        // TODO send network event
     }
 
     public move()
     {
-        this.row--;
-        this.movement.update();
+        this.moveUp();
         // TODO send network event here
     }
 
-    public get isDone(): boolean
+    public fire(col: number)
     {
-        return this.row < TOP_ROW;
+        this.col = col;
+        this.row = BOTTOM_ROW;
+        this.enterPlayfield();
+        // TODO send network event
     }
 
     public update(secondsPassed: number)
     {
-        this.moveIfCan();
+        this.moveUpIfCan();
     }
 
     public onRowUpdated(newRow: number)
@@ -73,38 +69,19 @@ export default class Missile extends PlayfieldGameObject
 
     public onCollision(other: GameObject)
     {
-        this.die();
+        this.exitPlayfield();
     }
 
-    private exitPlayfield()
+    public reset()
     {
+        super.reset();
+        this.movement.delay = DifficultySetting.difficulty.missileMovementDelay;
+    }
+    public restartMission()
+    {
+        this.reset();
         this.enabled = false;
-        this.dispatchOnExitPlayfield();
-        // TODO send a network event here
-    }
-
-    private moveIfCan()
-    {
-        if (!this.canMove)
-        {
-            return;
-        }
-
-        this.move();
-    }
-
-    private exitPlayfieldIfDone()
-    {
-        if (this.isDone)
-        {
-            this.exitPlayfield();
-        }
-    }
-
-    private die()
-    {
-        this.enabled = false;
-        this.dispatchOnDead();
-        // TODO send a network event here
+        this.hide();
+        // TODO send network event
     }
 }

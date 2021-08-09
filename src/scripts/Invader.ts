@@ -29,7 +29,10 @@ import Random from "./Random";
 import DifficultySetting from "./DifficultySetting";
 import PlayfieldGameObject from "./PlayfieldGameObject";
 import Interval from "./Interval";
-import InvaderController from './InvaderController';
+import InvaderSpawner from './InvaderSpawner';
+import Missile from './Missile';
+import {MovementDirection} from './Enums';
+import VFDGameObject from './VFDGameObject';
 
 let TextureCache = utils.TextureCache;
 
@@ -48,15 +51,16 @@ export default class Invader extends PlayfieldGameObject
     invaderSprite: Sprite;
     invaderExplosionSprite: Sprite;
     deathRay: DeathRay;
-    stepSidewaysInterval: Interval = new Interval();
-    stepDownInterval: Interval = new Interval();
+    protected firingInterval: Interval;
+
 
     public onLanded: Array<(Invader) => void> = new Array<(Invader) => void>();
     public index: number;
-    public controller: InvaderController;
+    public controller: InvaderSpawner;
 
     init()
     {
+        this.isLockedToPlayfield = true;
         this.rowOffset = INVADER_ROW_OFFSET;
         this.rowStep = INVADER_ROW_STEP;
         this.colOffset = INVADER_COL_OFFSET;
@@ -66,75 +70,128 @@ export default class Invader extends PlayfieldGameObject
         this.container.addChild(this.invaderSprite);
         this.invaderExplosionSprite = new Sprite(TextureCache[TEXTURE_INVADER_HIT]);
         this.container.addChild(this.invaderExplosionSprite);
-        this.invaderExplosionSprite.visible = false;
         this.invaderExplosionSprite.x = INVADER_EXPLOSION_OFFSET_X;
         this.invaderExplosionSprite.y = INVADER_EXPLOSION_OFFSET_Y;
-        this.deathRay = GameObject.createGameObject(DeathRay);
         this.collisionFlags = COLLISION_INVADER;
         this.collisionMask = COLLISION_MISSILE | COLLISION_MISSILE_BASE;
-        this.stepSidewaysInterval.delay = DifficultySetting.difficulty.invaderStepSidewaysDelay;
-        this.stepDownInterval.delay = DifficultySetting.difficulty.invaderStepDownDelay;
+        this.deathRay = VFDGameObject.createGameObject(DeathRay);
+        this.showNormal();
     }
 
     reset()
     {
         this.resetVisibility();
+        this.firingInterval = new Interval(DifficultySetting.difficulty.invaderFiringDelay);
+        this.movement.delay = DifficultySetting.difficulty.invaderMovementDelay;
         this.row = 1;
         this.col = 0;
-        this.movement.reset();
+        this.movement.update();
+        this.deathRay.enabled = false;
+        this.deathRay.hide();
     }
 
     public onRowUpdated(newRow: number)
     {
         this.changeTexturesForRow(newRow);
+        if (this.hasLanded)
+        {
+            this.dispatchOnLanded();
+        }
     }
 
     public onCollision(other: GameObject)
     {
-        this.die();
-    }
-
-    public moveLeft()
-    {
-        if (this.canMoveLeft)
+        if (other instanceof Missile)
         {
-            this.col--;
-            this.movement.update();
-            // TODO send network event
+            this.die();
         }
-
-    }
-
-    public moveRight()
-    {
-        if (this.canMoveRight)
-        {
-            this.col++;
-            this.movement.update();
-            // TODO send network event
-        }
-
-    }
-
-    public moveDown()
-    {
-        if (this.canMoveDown)
-        {
-            this.row++;
-            this.movement.update();
-            // TODO send network event
-        }
-
-    }
-
-    public get canMove(): boolean
-    {
-        return (!this.isDead && this.movement.hasElapsed);
     }
 
     public get hasLanded(): boolean
     {
-        throw Error("not implemented");
+        return (this.row == BOTTOM_ROW);
+    }
+
+    protected get isDeathRayAvailable(): boolean
+    {
+        return !this.deathRay.enabled;
+    }
+
+    protected _canMoveLeft(): boolean
+    {
+        return (super._canMoveLeft() && this.controller.isPlayfieldSpotEmpty(this.col - 1, this.row));
+    }
+
+    protected _canMoveRight(): boolean
+    {
+        return (super._canMoveRight() && this.controller.isPlayfieldSpotEmpty(this.col + 1, this.row));
+    }
+
+    protected _canMoveDown(): boolean
+    {
+        return (super._canMoveDown() && this.controller.isPlayfieldSpotEmpty(this.col, this.row + 1));
+    }
+
+    public get canFireDeathRay(): boolean
+    {
+        return (!this.isDead && this.firingInterval.hasElapsed && this.isDeathRayAvailable);
+    }
+
+    public moveHorizontally()
+    {
+        let direction = Random.leftOrRight();
+        if (direction == MovementDirection.Left)
+        {
+            if (this.canMoveLeft)
+            {
+                this.moveLeft();
+            }
+            else if (this.canMoveRight)
+            {
+                this.moveRight();
+            }
+        }
+        else
+        {
+            if (this.canMoveRight)
+            {
+                this.moveRight();
+            }
+            else
+            {
+                this.moveLeft();
+            }
+        }
+    }
+
+    public get shouldFireDeathRay(): boolean
+    {
+        return (Random.next() < DifficultySetting.difficulty.invaderFiringChance);
+    }
+
+    public get shouldStepSideways(): boolean
+    {
+        return (Random.next() < DifficultySetting.difficulty.invaderStepSidewaysChance);
+    }
+
+    public get shouldStepDown(): boolean
+    {
+        return (Random.next() < DifficultySetting.difficulty.invaderStepDownChance);
+    }
+
+    public fireIfCan()
+    {
+        if (!this.canFireDeathRay || !this.shouldFireDeathRay)
+        {
+            return;
+        }
+
+        this.fireDeathRay();
+    }
+
+    public fireDeathRay()
+    {
+        this.deathRay.fire(this.col, this.row);
     }
 
     public moveIfCan()
@@ -144,28 +201,34 @@ export default class Invader extends PlayfieldGameObject
             return;
         }
 
-        let shouldStepSideways = Random.next() < DifficultySetting.difficulty.invaderStepSidewaysChance;
-        let shouldStepDown = Random.next() < DifficultySetting.difficulty.invaderStepDownChance;
-
-        // throw Error("not implemented");
+        this.move();
     }
 
     public move()
     {
-        throw Error("not implemented");
+        if (this.shouldStepSideways)
+        {
+            this.moveHorizontally();
+        }
+        else if (this.shouldStepDown)
+        {
+            this.moveDown();
+        }
+
         this.dispatchOnMove();
     }
 
     public enterPlayfield()
     {
-        this.resetVisibility();
-        this._isDead = false;
-        this.enabled = true;
+        super.enterPlayfield();
+        // NOTE clever algorithm to determine invader starting position that ultimately proved to be unnecessary.
         // let possiblePositions = COLUMN_COUNT * DifficultySetting.difficulty.invaderLowestStartingRow / DifficultySetting.difficulty.invaderCount;
         // let randomPosition = Random.nextIntExclusive(0, Math.floor(possiblePositions));
         // let invaderStartingPosition = randomPosition * DifficultySetting.difficulty.invaderCount + this.index;
         // let col = Math.floor(invaderStartingPosition % COLUMN_COUNT);
         // let row = Math.floor(invaderStartingPosition / COLUMN_COUNT)+ INVADER_HIGHEST_ROW;
+
+        // determine a valid, random starting location for the invader that isn't occupied by another invader
         let col;
         let row;
         do
@@ -176,17 +239,6 @@ export default class Invader extends PlayfieldGameObject
 
         this.row = row;
         this.col = col;
-        //console.log("randomPosition", randomPosition, "invaderStartingPosition", invaderStartingPosition, "col", col, "row", row);
-
-        this.dispatchOnEnterPlayfield();
-    }
-
-    public die()
-    {
-        this.showExplosion();
-        this._isDead = true;
-        this.death.update();
-        this.dispatchOnDead();
     }
 
     public get pointValue(): number
@@ -196,19 +248,14 @@ export default class Invader extends PlayfieldGameObject
 
     public update()
     {
-        if (this.isDead && this.death.hasElapsed)
+        if (this.exitPlayfieldIfDone())
         {
-            this.exitPlayfield();
             return;
         }
 
         this.moveIfCan();
+        this.fireIfCan();
 
-    }
-
-    public exitPlayfield()
-    {
-        this.enabled = false;
     }
 
     private changeTexturesForRow(newRow: number)
@@ -229,24 +276,32 @@ export default class Invader extends PlayfieldGameObject
         }
     }
 
-    private resetVisibility()
-    {
-        this.show();
-        this.showNormal();
-        // TODO send network event
-
-    }
-
-    private showNormal()
+    public showNormal()
     {
         this.invaderSprite.visible = true;
         this.invaderExplosionSprite.visible = false;
+        // TODO send network event
     }
 
-    private showExplosion()
+    public showDead()
     {
         this.invaderExplosionSprite.visible = true;
         this.invaderSprite.visible = false;
+        // TODO send network event
     }
-}
 
+    public shutdownGame(): void
+    {
+        this.enabled = false;
+        this.deathRay.shutdownGame();
+    }
+
+    public restartMission()
+    {
+        this.reset();
+        this.enabled = false;
+        this.hide();
+        this.deathRay.reset();
+    }
+
+}

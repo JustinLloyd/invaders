@@ -16,6 +16,10 @@ export default class PlayfieldGameObject extends VFDGameObject
     protected _row: number = 0;
     protected _col: number = 0;
     protected _isDead: boolean = false;
+    public minRow: number = TOP_ROW;
+    public maxRow: number = BOTTOM_ROW;
+    public minCol: number = LEFT_COLUMN;
+    public maxCol: number = RIGHT_COLUMN;
 
     public onEnterPlayfield: Array<(GameObject) => void> = new Array<(GameObject) => void>();
     public onDead: Array<(GameObject) => void> = new Array<(GameObject) => void>();
@@ -23,6 +27,13 @@ export default class PlayfieldGameObject extends VFDGameObject
     public onExitPlayfield: Array<(GameObject) => void> = new Array<(GameObject) => void>();
     protected movement: Interval = new Interval(DEFAULT_MOVEMENT_DELAY);
     protected death: Interval = new Interval(DEFAULT_DEATH_DELAY);
+
+    public reset()
+    {
+        this._isDead = false;
+        this.movement.reset();
+        this.death.reset();
+    }
 
     public get isDead(): boolean
     {
@@ -91,10 +102,6 @@ export default class PlayfieldGameObject extends VFDGameObject
         if (this.isLockedToPlayfield == true)
         {
             Validation.range(newCol, LEFT_COLUMN, RIGHT_COLUMN);
-            // if ((newCol < LEFT_COLUMN) || (newCol > RIGHT_COLUMN))
-            // {
-            //     throw new RangeError("Column value must be between 0 and 2");
-            // }
         }
 
         this._col = newCol;
@@ -102,24 +109,44 @@ export default class PlayfieldGameObject extends VFDGameObject
         this.onColUpdated(newCol);
     }
 
-    protected get canMoveLeft(): boolean
+    protected _canMoveLeft(): boolean
     {
-        return (this._col > LEFT_COLUMN || !this.isLockedToPlayfield);
+        return (this._canMove() && (this._col > LEFT_COLUMN || !this.isLockedToPlayfield));
     }
 
-    protected get canMoveRight(): boolean
+    public get canMoveLeft(): boolean
     {
-        return (this._col < RIGHT_COLUMN || !this.isLockedToPlayfield);
+        return (this._canMoveLeft());
     }
 
-    protected get canMoveUp(): boolean
+    public get canMoveRight(): boolean
     {
-        return (this._row > TOP_ROW || !this.isLockedToPlayfield);
+        return (this._canMoveRight());
     }
 
-    protected get canMoveDown(): boolean
+    protected _canMoveRight(): boolean
     {
-        return (this._row < BOTTOM_ROW || !this.isLockedToPlayfield);
+        return (this._canMove() && (this._col < RIGHT_COLUMN || !this.isLockedToPlayfield));
+    }
+
+    public _canMoveUp(): boolean
+    {
+        return (this._canMove() && (this._row > TOP_ROW || !this.isLockedToPlayfield));
+    }
+
+    public get canMoveUp(): boolean
+    {
+        return (this._canMoveUp());
+    }
+
+    protected _canMoveDown(): boolean
+    {
+        return (this._canMove() && (this._row < BOTTOM_ROW || !this.isLockedToPlayfield));
+    }
+
+    public get canMoveDown(): boolean
+    {
+        return this._canMoveDown();
     }
 
     public set col(value: number)
@@ -130,6 +157,134 @@ export default class PlayfieldGameObject extends VFDGameObject
     public onColUpdated(newCol: number)
     {
         // do nothing
+    }
+
+    protected _canMove(): boolean
+    {
+        return this.movement.hasElapsed && !this.isDead;
+    }
+
+    public get canMove(): boolean
+    {
+        return this._canMove();
+    }
+
+    protected _isDone(): boolean
+    {
+        return this.row < this.minRow
+            || this.row > this.maxRow
+            || this.col < this.minCol
+            || this.col > this.maxCol
+            || (this.isDead && this.death.hasElapsed);
+
+    }
+
+    public get isDone(): boolean
+    {
+        return this._isDone();
+    }
+
+    public exitPlayfieldIfDone()
+    {
+        if (!this.isDone)
+        {
+            return false;
+        }
+
+        this.exitPlayfield();
+        return true;
+    }
+
+    public enterPlayfield()
+    {
+        this.enabled = true;
+        this.resetVisibility();
+        this.dispatchOnEnterPlayfield();
+        this.movement.update();
+        this.death.reset();
+        this._isDead = false;
+
+        // TODO send a network event here
+    }
+
+    public exitPlayfield()
+    {
+        this.enabled = false;
+        this.hide();
+        this.dispatchOnExitPlayfield();
+        this._isDead = false;
+        // TODO send a network event here
+    }
+
+
+    public moveLeftIfCan()
+    {
+        if (!this.canMoveLeft)
+        {
+            return;
+        }
+
+        this.moveLeft();
+
+    }
+
+    public moveRightIfCan()
+    {
+        if (!this.canMoveRight)
+        {
+            return;
+        }
+
+        this.moveRight();
+    }
+
+    public moveLeft()
+    {
+        this.col--;
+        this.movement.update();
+        // TODO send network event
+    }
+
+    public moveRight()
+    {
+        this.col++;
+        this.movement.update();
+        // TODO send network event
+    }
+
+    public moveUpIfCan()
+    {
+        if (!this.canMoveUp)
+        {
+            return;
+        }
+
+        this.moveUp();
+    }
+
+    public moveUp()
+    {
+        this.row--;
+        this.movement.update();
+        // TODO send network event
+    }
+
+    public moveDownIfCan()
+    {
+        if (!this.canMoveDown)
+        {
+            return;
+        }
+
+        this.moveDown();
+    }
+
+    public moveDown()
+    {
+        this.row++;
+        this.movement.update();
+        // TODO send network event
+
     }
 
     protected dispatchOnDead()
@@ -167,4 +322,32 @@ export default class PlayfieldGameObject extends VFDGameObject
         }
 
     }
+
+    public die()
+    {
+        this._isDead = true;
+        this.death.update();
+        this.showDead();
+        this.dispatchOnDead();
+        // TODO send network event
+    }
+
+    public resetVisibility()
+    {
+        this.show();
+        this.showNormal();
+        // TODO send network event
+    }
+
+    public showDead()
+    {
+        // do nothing
+    }
+
+    public showNormal()
+    {
+        // do nothing
+    }
+
+
 }

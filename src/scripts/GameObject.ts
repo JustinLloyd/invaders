@@ -20,15 +20,15 @@ export default class GameObject
     protected __isEnabled: boolean = true;
     protected __hasStarted: boolean = false;
     protected __hasInitialised: boolean = false;
-    public onDestroyed: Array<(Component) => void> = new Array<(Component) => void>();
-    public onEnabled: Array<(Component) => void>=new Array<(Component) => void>();
-    public onDisabled: Array<(Component) => void>= new Array<(Component) => void>();
+    public onDestroyed: Array<(gameObject: GameObject) => void> = new Array<(gameObject: GameObject) => void>();
+    public onEnabled: Array<(gameObject: GameObject) => void> = new Array<(gameObject: GameObject) => void>();
+    public onDisabled: Array<(gameObject: GameObject) => void> = new Array<(gameObject: GameObject) => void>();
     public collisionMask: number = 0;
     public collisionFlags: number = 0;
-    public onShown: Array<(GameObject) => void>=new Array<(GameObject) => void>();
-    public onHidden: Array<(GameObject) => void>= new Array<(GameObject) => void>();
+    public onShown: Array<(gameObject: GameObject) => void> = new Array<(gameObject: GameObject) => void>();
+    public onHidden: Array<(gameObject: GameObject) => void> = new Array<(gameObject: GameObject) => void>();
 
-    public static createGameObject<Type extends GameObject>(goType: { new(): Type }): Type
+    public static createGameObject<T extends GameObject>(goType: { new(): T }): T
     {
         let go = new goType();
         go._components = new Array<Component>();
@@ -43,7 +43,6 @@ export default class GameObject
             go.dispatchOnEnabled();
         }
 
-        //console.log(go);
         return (go);
     }
 
@@ -144,7 +143,7 @@ export default class GameObject
         {
             if (component instanceof GameBehaviour)
             {
-            //     let behaviour = component as GameBehaviour;
+                //     let behaviour = component as GameBehaviour;
                 (component as GameBehaviour)._lateUpdate(secondsPassed);
             }
         }
@@ -176,13 +175,13 @@ export default class GameObject
         this.__isEnabled = value;
         if (this.__isEnabled)
         {
-            this.show();
+            // this.show();
             this.dispatchOnEnabled();
             // TODO send network event
         }
         else
         {
-            this.hide();
+            // this.hide();
             this.dispatchOnDisabled();
             // TODO send network event
 

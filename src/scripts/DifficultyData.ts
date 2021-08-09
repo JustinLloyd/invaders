@@ -8,9 +8,10 @@ export default class DifficultyData
     public readonly invaderLowestStartingRow: number;
     public readonly invaderSpawnInterval: number;
     public readonly invaderSpawnChance: number;
-    public readonly invaderStepDownDelay: number;
+    public readonly invaderFiringDelay: number;
+    public readonly invaderFiringChance: number;
+    public readonly invaderMovementDelay: number;
     public readonly invaderStepDownChance: number;
-    public readonly invaderStepSidewaysDelay: number;
     public readonly invaderStepSidewaysChance: number;
     public readonly missileCount: number;
     public readonly missileMovementDelay: number;

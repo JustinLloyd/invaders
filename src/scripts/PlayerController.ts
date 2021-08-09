@@ -1,6 +1,7 @@
 import GameObject from "./GameObject";
 import GameWorld from "./GameWorld";
 import MissileBase from "./MissileBase";
+import VFDGameObject from './VFDGameObject';
 
 
 export default class MissileBaseController extends GameObject
@@ -9,7 +10,7 @@ export default class MissileBaseController extends GameObject
 
     public init()
     {
-        this.missileBase = GameObject.createGameObject(MissileBase);
+        this.missileBase = VFDGameObject.createGameObject(MissileBase);
     }
 
     public reset()
@@ -19,9 +20,13 @@ export default class MissileBaseController extends GameObject
 
     public update(secondsPassed: number)
     {
+        if (this.missileBase.isDead)
+        {
+            return;
+        }
+
         if (GameWorld.instance.inputSystem.isDownFire())
         {
-            console.log("Fire");
             this.missileBase.fireIfCan();
         }
 
@@ -38,5 +43,18 @@ export default class MissileBaseController extends GameObject
             this.missileBase.moveCenterIfCan();
         }
 
+    }
+
+    public shutdownGame()
+    {
+        this.enabled = false;
+        this.missileBase.shutdownGame();
+
+    }
+
+    public restartMission()
+    {
+        this.enabled=true;
+        this.missileBase.restartMission();
     }
 }

@@ -12,7 +12,7 @@ export const TOP_ROW = 0;
 export const BOTTOM_ROW = 6;
 export const DEFAULT_MOVEMENT_DELAY = 100;
 export const DEFAULT_DEATH_DELAY = 400;
-export const GAME_SCALE = 0.5;
+export const GAME_SCALE = 0.3;
 export const DIFFICULTY_MAX = 2;
 export const DIFFICULTY_MIN = 0;
 
@@ -49,7 +49,7 @@ export const INVADER_POINT_VALUE_ROW_3 = 1;
 export const INVADER_POINT_VALUE_ROW_4 = 1;
 export const INVADER_POINT_VALUE_ROW_5 = 1;
 
-export const DEATH_RAY_ROW_OFFSET = 364;
+export const DEATH_RAY_ROW_OFFSET = 158;
 export const DEATH_RAY_ROW_STEP = 198;
 export const DEATH_RAY_COL_OFFSET = 76;
 export const DEATH_RAY_COL_STEP = 144;

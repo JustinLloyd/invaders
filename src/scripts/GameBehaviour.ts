@@ -4,8 +4,8 @@ export default class GameBehaviour extends Behaviour
 {
     protected __isEnabled: boolean = true;
     protected __hasStarted: boolean = false;
-    public onEnabled: Array<(Component) => void>=new Array<(Component) => void>()
-    public onDisabled: Array<(Component) => void>= new Array<(Component) => void>();
+    public onEnabled: Array<(gameBehaviour:GameBehaviour) => void>=new Array<(gameBehaviour:GameBehaviour) => void>()
+    public onDisabled: Array<(gameBehaviour:GameBehaviour) => void>= new Array<(gameBehaviour:GameBehaviour) => void>();
 
 
     public _start()

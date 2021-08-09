@@ -10,11 +10,11 @@ export default class LivesIndicator extends VFDGameObject
     protected _lives: number;
     protected _maximumLives: number = 3;
     indicatorSprites: Array<Sprite>;
-    public onLifeDeducted: Array<(lives: number) => void> = new Array<(lives: number) => void>();
-    public onLifeAdded: Array<(lives: number) => void> = new Array<(lives: number) => void>();
-    public onLivesUpdated: Array<(lives: number) => void> = new Array<(lives: number) => void>();
-    public onOutOfLives: Array<() => void> = new Array<() => void>();
-    public onMaximumLivesAchieved: Array<() => void> = new Array<() => void>();
+    public onLifeDeducted: Array<(livesIndicator: LivesIndicator, lives: number) => void> = new Array<(livesIndicator: LivesIndicator, lives: number) => void>();
+    public onLifeAdded: Array<(livesIndicator: LivesIndicator, lives: number) => void> = new Array<(livesIndicator: LivesIndicator, lives: number) => void>();
+    public onLivesUpdated: Array<(livesIndicator: LivesIndicator, lives: number) => void> = new Array<(livesIndicator: LivesIndicator, lives: number) => void>();
+    public onOutOfLives: Array<(livesIndicator: LivesIndicator) => void> = new Array<(livesIndicator: LivesIndicator) => void>();
+    public onMaximumLivesAchieved: Array<(livesIndicator: LivesIndicator) => void> = new Array<(livesIndicator: LivesIndicator) => void>();
 
     public init()
     {
@@ -60,6 +60,7 @@ export default class LivesIndicator extends VFDGameObject
             return;
         }
 
+        this._lives++;
         if (this._lives == this._maximumLives)
         {
             this.dispatchOnMaximumLivesAchieved();
@@ -71,17 +72,18 @@ export default class LivesIndicator extends VFDGameObject
 
     public deductLife()
     {
-        if (this._lives > 0)
+        if (this._lives <= 0)
         {
-            this._lives--;
-            this.indicatorSprites[this._lives].visible = false;
-            this.dispatchOnLifeDeducted();
-            this.dispatchOnLivesUpdated();
-            if (this.isOutOfLives)
-            {
-                this.dispatchOnOutOfLives();
-            }
+            return;
+        }
 
+        this._lives--;
+        this.indicatorSprites[this._lives].visible = false;
+        this.dispatchOnLifeDeducted();
+        this.dispatchOnLivesUpdated();
+        if (this.isOutOfLives)
+        {
+            this.dispatchOnOutOfLives();
         }
     }
 
@@ -89,7 +91,7 @@ export default class LivesIndicator extends VFDGameObject
     {
         for (let callback of this.onLifeDeducted)
         {
-            callback(this._lives);
+            callback(this, this._lives);
         }
     }
 
@@ -97,7 +99,7 @@ export default class LivesIndicator extends VFDGameObject
     {
         for (let callback of this.onLifeAdded)
         {
-            callback(this._lives);
+            callback(this, this._lives);
         }
     }
 
@@ -105,7 +107,7 @@ export default class LivesIndicator extends VFDGameObject
     {
         for (let callback of this.onLivesUpdated)
         {
-            callback(this._lives);
+            callback(this, this._lives);
         }
     }
 
@@ -114,7 +116,7 @@ export default class LivesIndicator extends VFDGameObject
     {
         for (let callback of this.onMaximumLivesAchieved)
         {
-            callback();
+            callback(this);
         }
     }
 
@@ -122,7 +124,7 @@ export default class LivesIndicator extends VFDGameObject
     {
         for (let callback of this.onOutOfLives)
         {
-            callback();
+            callback(this);
         }
     }
 
@@ -133,6 +135,6 @@ export default class LivesIndicator extends VFDGameObject
 
     public get isOutOfLives(): boolean
     {
-        return this._lives == 0;
+        return this._lives <= 0;
     }
 }
