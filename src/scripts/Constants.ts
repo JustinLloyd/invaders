@@ -6,12 +6,12 @@ export const TOP_ROW = 0;
 export const BOTTOM_ROW = 6;
 export const DEFAULT_MOVEMENT_DELAY = 100;
 export const DEFAULT_DEATH_DELAY = 400;
-export const GAME_SCALE = 1;
+export const GAME_SCALE = 0.3;
 
 export const DIFFICULTY_MAX = 2;
 export const DIFFICULTY_MIN = 0;
-export const DIFFICULTY_INDICATOR_X_OFFSET = 100;
-export const DIFFICULTY_INDICATOR_Y_OFFSET = 100;
+export const DIFFICULTY_INDICATOR_X_OFFSET = 6;
+export const DIFFICULTY_INDICATOR_Y_OFFSET = 8;
 
 // recognized keycodes
 export const KEY_CODE_MOVE_LEFT: number = 90; // Z

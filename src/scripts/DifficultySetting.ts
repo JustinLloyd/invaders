@@ -110,7 +110,6 @@ export default class DifficultySetting extends VFDGameObject
     {
         DifficultySetting.instance = this;
         this.indicatorTextureNames = [TEXTURE_DIFFICULTY_INDICATOR_00, TEXTURE_DIFFICULTY_INDICATOR_01, TEXTURE_DIFFICULTY_INDICATOR_02];
-
         this.indicatorSprite = new Sprite(TextureCache[this.indicatorTextureNames[0]]);
         this.container.addChild(this.indicatorSprite);
         this.container.x = DIFFICULTY_INDICATOR_X_OFFSET;
@@ -120,7 +119,8 @@ export default class DifficultySetting extends VFDGameObject
 
     public reset()
     {
-        this.currentDifficulty = 0;
+        this._currentDifficulty = 0;
+//        this.changeTexturesForDifficulty(this._currentDifficulty);
     }
 
     get currentDifficulty(): number
@@ -159,11 +159,6 @@ export default class DifficultySetting extends VFDGameObject
     private changeTexturesForDifficulty(difficulty: number)
     {
         Validation.range(difficulty, DIFFICULTY_MIN, DIFFICULTY_MAX);
-        // if ((difficulty < DIFFICULTY_MIN) || (difficulty > DIFFICULTY_MAX))
-        // {
-        //     return;
-        // }
-
         this.indicatorSprite.texture = TextureCache[this.indicatorTextureNames[difficulty]];
     }
 

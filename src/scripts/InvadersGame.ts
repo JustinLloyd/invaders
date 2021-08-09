@@ -252,8 +252,8 @@ class InvadersGame extends PlayfieldGameWorld
 
     public createWorld()
     {
-        this.difficulty = VFDGameObject.createGameObject(DifficultySetting);
         this.playfield = GameObject.createGameObject(Playfield);
+        this.difficulty = VFDGameObject.createGameObject(DifficultySetting);
 
         // player lives setup
         this.livesIndicator = VFDGameObject.createGameObject(LivesIndicator);
@@ -300,6 +300,27 @@ class InvadersGame extends PlayfieldGameWorld
     {
         if (this.inputSystem.isDownReset())
         {
+            this.resetGame();
+            return;
+        }
+
+        if (this.inputSystem.isDownDifficulty1())
+        {
+            this.difficulty.currentDifficulty = 0;
+            this.resetGame();
+            return;
+        }
+
+        if (this.inputSystem.isDownDifficulty2())
+        {
+            this.difficulty.currentDifficulty = 1;
+            this.resetGame();
+            return;
+        }
+
+        if (this.inputSystem.isDownDifficulty3())
+        {
+            this.difficulty.currentDifficulty = 2;
             this.resetGame();
             return;
         }
