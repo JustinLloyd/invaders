@@ -1,7 +1,7 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
 import GameObject from "./GameObject";
-import {Sprite, Container, utils} from "pixi.js";
+import {Sprite, utils} from "pixi.js";
 import {TEXTURE_VFD_PLAYFIELD} from "./Constants";
 
 let TextureCache = utils.TextureCache;

@@ -3,7 +3,7 @@
 import GameObject from "./GameObject";
 import {GlowFilter} from "pixi-filters";
 import {filters} from 'pixi.js';
-import "gsap";
+import gsap from "gsap";
 
 export default class VFDGameObject extends GameObject
 {

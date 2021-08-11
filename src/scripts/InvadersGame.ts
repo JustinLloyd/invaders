@@ -1,7 +1,7 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
 import * as $ from "jquery";
-import * as PIXI from 'pixi.js';
+import * as PIXI from "pixi.js"
 import GameObject from "./GameObject";
 import Invader from "./Invader";
 import DifficultySetting from "./DifficultySetting";
@@ -11,8 +11,6 @@ import MissileBase from "./MissileBase";
 import Bonus from "./Bonus";
 import Scoreboard from "./Scoreboard";
 import LivesIndicator from "./LivesIndicator";
-import GameWorld from "./GameWorld";
-import GameObjectPool from "./GameObjectPool";
 import Playfield from "./Playfield";
 import DebugInfo from "./DebugInfo";
 import {
@@ -72,45 +70,17 @@ let digit_07 = require('url:../assets/digit-07.png');
 let digit_08 = require('url:../assets/digit-08.png');
 let digit_09 = require('url:../assets/digit-09.png');
 
-let Application = PIXI.Application,
-    Container = PIXI.Container,
-    resources = PIXI.Loader.shared.resources,
-    loader = PIXI.Loader.shared,
-    TextureCache = PIXI.utils.TextureCache,
-    Sprite = PIXI.Sprite,
-    Rectangle = PIXI.Rectangle;
+let     loader = PIXI.Loader.shared;
 
 enum GameState
 {
     Playing,
     PlayerWon,
-    PlayerLosesLife,
     PlayerLost,
 
 }
 
-// interface TestArray<T>
-// {
-//     [position:number]:T;
-//     length:number;
-//     add(item:T):number;
-// }
-//
-// class TestArrayClass<T> implements TestArray<T>
-// {
-//     [position: number]: T;
-//
-//     public length: number;
-//
-//     public add(item: T): number
-//     {
-//         this.push
-//         return 0;
-//     }
-//
-// }
-//
-class InvadersGame extends PlayfieldGameWorld
+export class InvadersGame extends PlayfieldGameWorld
 {
     difficulty: DifficultySetting;
     instructions: Instructions;
@@ -122,16 +92,9 @@ class InvadersGame extends PlayfieldGameWorld
     gameState: GameState;
     private missileBaseController: MissileBaseController;
     private bonusController: BonusController;
-    //dispatchTest:EventDispatch<(lives:number) => void> = new EventDispatch<(lives:number) => void>();
-    //    public dispatchTest: Array<() => void> = new Array<() => void>() ;
-    //    public dispatchTest2: (() => void)[] = [];
 
     init()
     {
-        //this.dispatchTest2 = []
-        // this.dispatchTest2.push(this.callbackTest)
-        // this.dispatchTest.push(this.callbackTest);
-        // this.dispatchTest2.forEach(callback => callback())
         this.createWorld();
     }
 

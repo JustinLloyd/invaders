@@ -2,11 +2,10 @@
 
 import * as PIXI from 'pixi.js';
 import * as $ from "jquery";
-import "gsap";
+import {gsap} from "gsap";
 import {PixiPlugin}  from "gsap/PixiPlugin";
 import GameObject from "./GameObject";
 import InputSystem from "./InputSystem";
-import Component from "./Component";
 import {GAME_SCALE} from "./Constants";
 
 let loader = PIXI.Loader.shared;
@@ -45,7 +44,8 @@ export default abstract class GameWorld
 
     initLibraries()
     {
-        GameWorld.app = new PIXI.Application({width: 1200, height: 1700, autoStart: false, sharedLoader: true});
+        GameWorld.app = new PIXI.Application({width: 950*GAME_SCALE, height: 2350*GAME_SCALE, autoStart: false, sharedLoader: true});
+        gsap.registerPlugin(PixiPlugin);
         PixiPlugin.registerPIXI(PIXI);
 
         GameWorld.app.ticker.maxFPS = 30;

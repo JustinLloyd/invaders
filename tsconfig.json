@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "system",
+    "module": "commonjs",
     "target": "es6",
     "sourceMap": true,
     "removeComments": true,
@@ -21,10 +21,9 @@
     "final"
   ],
   "include": [
-    "src/scripts/**/*",
+    "src/scripts/**/*.ts",
     "src/html/*",
     "src/css/*",
     "src/assets/**/*",
-    "./package.json"
   ]
 }

@@ -17,6 +17,8 @@ export const DIFFICULTY_INDICATOR_Y_OFFSET = 8;
 
 export const INSTRUCTIONS_X_OFFSET=0;
 export const INSTRUCTIONS_Y_OFFSET=1800;
+export const INSTRUCTIONS_TEXT_X_OFFSET=26;
+export const INSTRUCTIONS_TEXT_Y_OFFSET=0;
 
 // recognized keycodes
 export const KEY_CODE_MOVE_LEFT: number = 90; // Z
