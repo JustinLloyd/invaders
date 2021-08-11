@@ -1,17 +1,24 @@
 {
   "compilerOptions": {
     "module": "system",
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true,
     "removeComments": true,
     "outDir": "build/",
     "moduleResolution": "node",
-    "lib": [ "dom" ]
+    "lib": [ "es6", "dom" ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "exclude": [
     ".git",
     "node_modules",
-    "**/dist/**"
+    "dist",
+    "build",
+    "artwork",
+    "SVG",
+    "final"
   ],
   "include": [
     "src/scripts/**/*",

@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 
 // difficulty 0
 export const DIFFICULTY_0_INVADER_COUNT = 2;

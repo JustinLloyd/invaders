@@ -1,19 +1,9 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import {Sprite, utils} from "pixi.js";
-import GameObject from "./GameObject";
 import {
-    SCOREBOARD_OFFSET_X,
-    SCOREBOARD_OFFSET_Y,
-    SCOREBOARD_STEP_X,
-    TEXTURE_DIGIT_00,
-    TEXTURE_DIGIT_01,
-    TEXTURE_DIGIT_02,
-    TEXTURE_DIGIT_03,
-    TEXTURE_DIGIT_04,
-    TEXTURE_DIGIT_05,
-    TEXTURE_DIGIT_06,
-    TEXTURE_DIGIT_07,
-    TEXTURE_DIGIT_08,
-    TEXTURE_DIGIT_09
+    SCOREBOARD_OFFSET_X, SCOREBOARD_OFFSET_Y, SCOREBOARD_STEP_X,
+    TEXTURE_DIGIT_00, TEXTURE_DIGIT_01, TEXTURE_DIGIT_02, TEXTURE_DIGIT_03, TEXTURE_DIGIT_04, TEXTURE_DIGIT_05, TEXTURE_DIGIT_06, TEXTURE_DIGIT_07, TEXTURE_DIGIT_08, TEXTURE_DIGIT_09
 } from "./Constants";
 import VFDGameObject from "./VFDGameObject";
 import Validation from "./Validation";

@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 export default class Clamp
 {
     public static atMost(value: number, bound: number): number

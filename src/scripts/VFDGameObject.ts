@@ -1,4 +1,5 @@
-// let TextureCache = PIXI.utils.TextureCache;
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import GameObject from "./GameObject";
 import {GlowFilter} from "pixi-filters";
 import {filters} from 'pixi.js';

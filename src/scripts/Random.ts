@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import Validation from "./Validation";
 import {MovementDirection} from './Enums';
 

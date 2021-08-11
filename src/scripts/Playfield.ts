@@ -1,4 +1,5 @@
-import * as PIXI from 'pixi.js';
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import GameObject from "./GameObject";
 import {Sprite, Container, utils} from "pixi.js";
 import {TEXTURE_VFD_PLAYFIELD} from "./Constants";

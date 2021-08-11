@@ -1,6 +1,7 @@
-/build/
+/build/**/*
+/final/**/*
 /node_modules/
-/dist/
+/dist/**/*
 /.parcel-cache/
 /.idea/
 /package-lock.json

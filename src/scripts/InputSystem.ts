@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import {
     ACTION_DIFFICULTY_1, ACTION_DIFFICULTY_2, ACTION_DIFFICULTY_3,
     ACTION_FIRE,

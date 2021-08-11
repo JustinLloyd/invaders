@@ -1,4 +1,5 @@
-import GameObject from "./GameObject";
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import {BOTTOM_ROW, DEFAULT_DEATH_DELAY, DEFAULT_MOVEMENT_DELAY, LEFT_COLUMN, RIGHT_COLUMN, TOP_ROW} from "./Constants";
 import Interval from "./Interval";
 import Validation from "./Validation";

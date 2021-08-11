@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import GameWorld from "./GameWorld";
 import PlayfieldGameObject from "./PlayfieldGameObject";
 

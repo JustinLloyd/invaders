@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import * as PIXI from 'pixi.js';
 import * as $ from "jquery";
 import "gsap";

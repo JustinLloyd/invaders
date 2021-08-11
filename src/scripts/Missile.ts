@@ -1,4 +1,5 @@
-import * as PIXI from 'pixi.js';
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import {Sprite, utils} from "pixi.js";
 import {
     BOTTOM_ROW, COLLISION_BONUS,

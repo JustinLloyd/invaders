@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import {Sprite, utils} from 'pixi.js';
 import {LIVES_INDICATOR_X_OFFSET, LIVES_INDICATOR_X_STEP, LIVES_INDICATOR_Y_OFFSET} from "./Constants";
 import VFDGameObject from "./VFDGameObject";

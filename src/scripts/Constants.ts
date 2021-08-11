@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 export const RIGHT_COLUMN = 2;
 export const LEFT_COLUMN = 0;
 export const CENTER_COLUMN = 1;
@@ -12,6 +14,9 @@ export const DIFFICULTY_MAX = 2;
 export const DIFFICULTY_MIN = 0;
 export const DIFFICULTY_INDICATOR_X_OFFSET = 6;
 export const DIFFICULTY_INDICATOR_Y_OFFSET = 8;
+
+export const INSTRUCTIONS_X_OFFSET=0;
+export const INSTRUCTIONS_Y_OFFSET=1800;
 
 // recognized keycodes
 export const KEY_CODE_MOVE_LEFT: number = 90; // Z
@@ -127,6 +132,8 @@ export const TEXTURE_VFD_PLAYFIELD = 'vfd-playfield';
 export const TEXTURE_DIFFICULTY_INDICATOR_00 = 'difficulty-00';
 export const TEXTURE_DIFFICULTY_INDICATOR_01 = 'difficulty-01';
 export const TEXTURE_DIFFICULTY_INDICATOR_02 = 'difficulty-02';
+export const TEXTURE_INSTRUCTIONS = 'instructions';
+export const TEXTURE_INSTRUCTIONS_BACKGROUND = 'instructions-background';
 
 export const COLLISION_MISSILE_BASE = 1 << 0;
 export const COLLISION_MISSILE = 1 << 1;

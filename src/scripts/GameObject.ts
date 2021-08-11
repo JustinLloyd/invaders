@@ -1,17 +1,9 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import {Container} from "pixi.js";
 import GameWorld from "./GameWorld";
-import {GlowFilter} from 'pixi-filters';
 import Component from "./Component";
 import GameBehaviour from "./GameBehaviour";
-import Behaviour from "./Behaviour";
-
-// let Application = PIXI.Application,
-//     Container = PIXI.Container,
-//     loader = PIXI.Loader.shared,
-//     resources = PIXI.Loader.shared.resources,
-//     TextureCache = PIXI.utils.TextureCache,
-//     Rectangle = PIXI.Rectangle;
-
 
 export default class GameObject
 {

@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import * as $ from "jquery";
 import * as PIXI from 'pixi.js';
 import GameObject from "./GameObject";
@@ -14,34 +16,15 @@ import GameObjectPool from "./GameObjectPool";
 import Playfield from "./Playfield";
 import DebugInfo from "./DebugInfo";
 import {
-    BOTTOM_ROW, COLUMN_COUNT, INVADER_HIGHEST_ROW,
-    LEFT_COLUMN, MAX_LIVES,
-    MAX_POINTS, RIGHT_COLUMN, SCOREBOARD_OFFSET_X, SCOREBOARD_OFFSET_Y, SCOREBOARD_STEP_X,
-    TEXTURE_BONUS_01,
-    TEXTURE_BONUS_02,
-    TEXTURE_BONUS_HIT_01,
-    TEXTURE_BONUS_HIT_02,
-    TEXTURE_DEATH_RAY_01,
-    TEXTURE_DEATH_RAY_02, TEXTURE_DIFFICULTY_INDICATOR_00, TEXTURE_DIFFICULTY_INDICATOR_01, TEXTURE_DIFFICULTY_INDICATOR_02,
-    TEXTURE_DIGIT_00,
-    TEXTURE_DIGIT_01,
-    TEXTURE_DIGIT_02,
-    TEXTURE_DIGIT_03,
-    TEXTURE_DIGIT_04,
-    TEXTURE_DIGIT_05,
-    TEXTURE_DIGIT_06,
-    TEXTURE_DIGIT_07,
-    TEXTURE_DIGIT_08,
-    TEXTURE_DIGIT_09,
-    TEXTURE_INVADER_01,
-    TEXTURE_INVADER_02,
-    TEXTURE_INVADER_HIT,
-    TEXTURE_INVADER_LANDED,
+    BOTTOM_ROW, COLUMN_COUNT, LEFT_COLUMN, MAX_LIVES, MAX_POINTS, INVADER_HIGHEST_ROW,
+    TEXTURE_BONUS_01, TEXTURE_BONUS_02, TEXTURE_BONUS_HIT_01, TEXTURE_BONUS_HIT_02,
+    TEXTURE_DEATH_RAY_01, TEXTURE_DEATH_RAY_02,
+    TEXTURE_DIFFICULTY_INDICATOR_00, TEXTURE_DIFFICULTY_INDICATOR_01, TEXTURE_DIFFICULTY_INDICATOR_02,
+    TEXTURE_DIGIT_00, TEXTURE_DIGIT_01, TEXTURE_DIGIT_02, TEXTURE_DIGIT_03, TEXTURE_DIGIT_04, TEXTURE_DIGIT_05, TEXTURE_DIGIT_06, TEXTURE_DIGIT_07, TEXTURE_DIGIT_08, TEXTURE_DIGIT_09,
+    TEXTURE_INSTRUCTIONS, TEXTURE_INSTRUCTIONS_BACKGROUND,
+    TEXTURE_INVADER_01, TEXTURE_INVADER_02, TEXTURE_INVADER_HIT, TEXTURE_INVADER_LANDED,
     TEXTURE_LIVES_INDICATOR,
-    TEXTURE_MISSILE,
-    TEXTURE_MISSILE_BASE,
-    TEXTURE_MISSILE_BASE_ARMED,
-    TEXTURE_MISSILE_BASE_HIT,
+    TEXTURE_MISSILE, TEXTURE_MISSILE_BASE, TEXTURE_MISSILE_BASE_ARMED, TEXTURE_MISSILE_BASE_HIT,
     TEXTURE_VFD_PLAYFIELD, TOP_ROW
 } from "./Constants";
 import PlayfieldGameWorld from "./PlayfieldGameWorld";
@@ -49,6 +32,8 @@ import InvaderSpawner from "./InvaderSpawner";
 import BonusController from "./BonusController";
 import MissileBaseController from "./PlayerController";
 import VFDGameObject from './VFDGameObject';
+import {Instructions} from './Instructions';
+import {InstructionsBackground} from './InstructionsBackground';
 
 let invader_01 = require('url:../assets/invader-01.png');
 let invader_02 = require('url:../assets/invader-02.png');
@@ -73,6 +58,8 @@ let difficulty_indicator_01 = require('url:../assets/difficulty-indicator-01.png
 let difficulty_indicator_02 = require('url:../assets/difficulty-indicator-02.png');
 
 let vfd_playfield = require('url:../assets/vfd-playfield.png');
+let instructions = require('url:../assets/instructions.png');
+let instructions_background = require('url:../assets/instructions-background.png');
 
 let digit_00 = require('url:../assets/digit-00.png');
 let digit_01 = require('url:../assets/digit-01.png');
@@ -126,6 +113,8 @@ enum GameState
 class InvadersGame extends PlayfieldGameWorld
 {
     difficulty: DifficultySetting;
+    instructions: Instructions;
+    instructionsBackground: InstructionsBackground;
     scoreboard: Scoreboard;
     livesIndicator: LivesIndicator;
     playfield: Playfield;
@@ -209,6 +198,10 @@ class InvadersGame extends PlayfieldGameWorld
     {
         for (let go of this.gameObjects)
         {
+            if (go == this.instructions)
+            {
+                continue;
+            }
             if (go instanceof VFDGameObject)
             {
                 (go as VFDGameObject).fastblink();
@@ -254,6 +247,8 @@ class InvadersGame extends PlayfieldGameWorld
     {
         this.playfield = GameObject.createGameObject(Playfield);
         this.difficulty = VFDGameObject.createGameObject(DifficultySetting);
+        this.instructionsBackground = GameObject.createGameObject(InstructionsBackground);
+        this.instructions = VFDGameObject.createGameObject(Instructions);
 
         // player lives setup
         this.livesIndicator = VFDGameObject.createGameObject(LivesIndicator);
@@ -373,7 +368,11 @@ class InvadersGame extends PlayfieldGameWorld
             .add(TEXTURE_DIGIT_09, digit_09)
 
             // playfield
-            .add(TEXTURE_VFD_PLAYFIELD, vfd_playfield);
+            .add(TEXTURE_VFD_PLAYFIELD, vfd_playfield)
+
+            // instructions
+            .add(TEXTURE_INSTRUCTIONS, instructions)
+            .add(TEXTURE_INSTRUCTIONS_BACKGROUND, instructions_background);
 
     }
 

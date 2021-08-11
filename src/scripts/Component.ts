@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 export default class Component
 {
     public onDestroyed: Array<(component: Component) => void> = new Array<(component: Component) => void>();

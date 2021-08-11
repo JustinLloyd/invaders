@@ -1,21 +1,17 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import DifficultyData from "./DifficultyData";
-import GameObject from "./GameObject";
 import {
-    BOTTOM_ROW,
     DIFFICULTY_INDICATOR_X_OFFSET,
     DIFFICULTY_INDICATOR_Y_OFFSET,
     DIFFICULTY_MAX,
     DIFFICULTY_MIN,
-    INVADER_HIGHEST_ROW,
     TEXTURE_DIFFICULTY_INDICATOR_00,
     TEXTURE_DIFFICULTY_INDICATOR_01,
-    TEXTURE_DIFFICULTY_INDICATOR_02,
-    TEXTURE_INVADER_01,
-    TEXTURE_INVADER_02,
-    TEXTURE_INVADER_LANDED
+    TEXTURE_DIFFICULTY_INDICATOR_02
 } from "./Constants";
 
-import * as DIFFICULTY from "./DifficultyConstants"
+import * as DIFFICULTY from "./DifficultyConstants";
 
 import Clamp from "./Clamp";
 import VFDGameObject from './VFDGameObject';

@@ -1,3 +1,5 @@
+// (c) Copyright 2021 Justin Lloyd. All rights reserved.
+
 import {Sprite, utils} from "pixi.js";
 import GameObject from "./GameObject";
 import * as CONSTANTS from "./Constants";
