@@ -1,47 +1,5 @@
 /* (c) Copyright 2021 Justin Lloyd. All rights reserved. */
 
-.segment
-{
-    position: absolute;
-}
-.segment00
-{
-    left: 4px;
-    top: 0;
-}
-.segment01
-{
-    left: 24px; top: 4px
-}
-.alien-02
-{
-    fill:none;
-    stroke:#00adee;
-    stroke-miterlimit:10;
-    stroke-width:0.25px;
-}
-
-.segment
-{
-    width: 100px;
-    height: auto;
-}
-.digit
-{
-
-}
-.digit01
-{
-
-}
-.digit02
-{
-
-}
-.digit03
-{
-
-}
 #playfield
 {
     width: 400px;
