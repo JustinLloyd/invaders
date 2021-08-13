@@ -1,7 +1,7 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
 import * as $ from "jquery";
-import * as PIXI from "pixi.js"
+import * as PIXI from "pixi.js";
 import GameObject from "../lib/GameObject";
 import Invader from "./Invader";
 import DifficultySetting from "./DifficultySetting";
@@ -23,12 +23,12 @@ import {
     TEXTURE_INVADER_01, TEXTURE_INVADER_02, TEXTURE_INVADER_HIT, TEXTURE_INVADER_LANDED,
     TEXTURE_LIVES_INDICATOR,
     TEXTURE_MISSILE, TEXTURE_MISSILE_BASE, TEXTURE_MISSILE_BASE_ARMED, TEXTURE_MISSILE_BASE_HIT,
-    TEXTURE_VFD_PLAYFIELD, TOP_ROW
+    TEXTURE_VFD_PLAYFIELD, TOP_ROW, GAME_SCALE
 } from "./Constants";
 import PlayfieldGameWorld from "./PlayfieldGameWorld";
 import InvaderSpawner from "./InvaderSpawner";
 import BonusController from "./BonusController";
-import MissileBaseController from "./PlayerController";
+import MissileBaseController from "./MissileBaseController";
 import VFDGameObject from '../lib/VFDGameObject';
 import {Instructions} from './Instructions';
 import {InstructionsBackground} from './InstructionsBackground';
@@ -71,7 +71,7 @@ let digit_07 = require('url:../assets/digit-07.png');
 let digit_08 = require('url:../assets/digit-08.png');
 let digit_09 = require('url:../assets/digit-09.png');
 
-let     loader = PIXI.Loader.shared;
+let loader = PIXI.Loader.shared;
 
 enum GameState
 {
@@ -93,6 +93,14 @@ export class InvadersGame extends PlayfieldGameWorld
     gameState: GameState;
     private missileBaseController: MissileBaseController;
     private bonusController: BonusController;
+
+    constructor()
+    {
+        super();
+        this._gameScale = GAME_SCALE;
+        this._viewportWidth = 950;
+        this._viewportHeight = 2350;
+    }
 
     init()
     {

@@ -7,6 +7,7 @@ import {PixiPlugin}  from "gsap/PixiPlugin";
 import GameObject from "./GameObject";
 import InputSystem from "./InputSystem";
 import {GAME_SCALE} from "../scripts/Constants";
+import {EventEmitter} from 'eventemitter3';
 
 let loader = PIXI.Loader.shared;
 
@@ -16,12 +17,15 @@ let loader = PIXI.Loader.shared;
 
 export default abstract class GameWorld
 {
+    events:any;
     protected isDebug: boolean = false;
     protected isCheatEnabled: boolean = false;
     public isLocal: boolean;
     public static instance: GameWorld;
+    protected _gameScale:number=1.0;
+    protected _viewportWidth:number=640;
+    protected _viewportHeight:number=480;
     canvas: HTMLCanvasElement;
-    oldTimestamp: number;
     gameObjects: Array<GameObject>;
     // __gameObjectsToStart: Array<GameObject>;f
     // __gameBehavioursToStart: Array<Component>;
@@ -33,23 +37,22 @@ export default abstract class GameWorld
     {
         this.isLocal = true;
         this.canvas = null;
-        this.oldTimestamp = 0;
         this.gameObjects = new Array<GameObject>();
         // this.__gameObjectsToStart = new Array<GameObject>();
         // this.__gameObjectsToDestroy = new Array<GameObject>();
-        this.inputSystem = new InputSystem();
         GameWorld.instance = this;
-        this.initLibraries();
     }
 
-    initLibraries()
+    protected initGameEngine()
     {
-        GameWorld.app = new PIXI.Application({width: 950*GAME_SCALE, height: 2350*GAME_SCALE, autoStart: false, sharedLoader: true});
+        this.events = new EventEmitter();
+        this.inputSystem = new InputSystem();
+        GameWorld.app = new PIXI.Application({width: this._viewportWidth*this._gameScale, height: this._viewportHeight*this._gameScale, autoStart: false, sharedLoader: true});
         gsap.registerPlugin(PixiPlugin);
         PixiPlugin.registerPIXI(PIXI);
 
         GameWorld.app.ticker.maxFPS = 30;
-        GameWorld.app.stage.scale.set(GAME_SCALE);
+        GameWorld.app.stage.scale.set(this._gameScale);
         // GameWorld.app.view.style.width="200px";
         // GameWorld.app.view.style.height="500px";
         // GameWorld.app.renderer.resize(200, 500);
@@ -69,6 +72,7 @@ export default abstract class GameWorld
 
     go()
     {
+        this.initGameEngine();
         this.loadAssets();
         loader.load(this.onAssetsLoaded.bind(this));
 
