@@ -13,10 +13,10 @@ import {
 
 import * as DIFFICULTY from "./DifficultyConstants";
 
-import Clamp from "./Clamp";
-import VFDGameObject from './VFDGameObject';
+import Clamp from "../lib/Clamp";
+import VFDGameObject from '../lib/VFDGameObject';
 import {Sprite, utils} from 'pixi.js';
-import Validation from './Validation';
+import Validation from '../lib/Validation';
 
 
 let TextureCache = utils.TextureCache;

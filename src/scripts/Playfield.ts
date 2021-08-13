@@ -1,6 +1,6 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
-import GameObject from "./GameObject";
+import GameObject from "../lib/GameObject";
 import {Sprite, utils} from "pixi.js";
 import {TEXTURE_VFD_PLAYFIELD} from "./Constants";
 

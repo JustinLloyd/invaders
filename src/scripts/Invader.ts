@@ -25,16 +25,16 @@ import {
     TEXTURE_INVADER_HIT,
     TEXTURE_INVADER_LANDED
 } from "./Constants";
-import GameObject from "./GameObject";
+import GameObject from "../lib/GameObject";
 import DeathRay from "./DeathRay";
-import Random from "./Random";
+import Random from "../lib/Random";
 import DifficultySetting from "./DifficultySetting";
 import PlayfieldGameObject from "./PlayfieldGameObject";
-import Interval from "./Interval";
+import Interval from "../lib/Interval";
 import InvaderSpawner from './InvaderSpawner';
 import Missile from './Missile';
 import {MovementDirection} from './Enums';
-import VFDGameObject from './VFDGameObject';
+import VFDGameObject from '../lib/VFDGameObject';
 
 let TextureCache = utils.TextureCache;
 

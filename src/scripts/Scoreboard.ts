@@ -5,12 +5,18 @@ import {
     SCOREBOARD_OFFSET_X, SCOREBOARD_OFFSET_Y, SCOREBOARD_STEP_X,
     TEXTURE_DIGIT_00, TEXTURE_DIGIT_01, TEXTURE_DIGIT_02, TEXTURE_DIGIT_03, TEXTURE_DIGIT_04, TEXTURE_DIGIT_05, TEXTURE_DIGIT_06, TEXTURE_DIGIT_07, TEXTURE_DIGIT_08, TEXTURE_DIGIT_09
 } from "./Constants";
-import VFDGameObject from "./VFDGameObject";
-import Validation from "./Validation";
+import VFDGameObject from "../lib/VFDGameObject";
+import Validation from "../lib/Validation";
 import DifficultySetting from './DifficultySetting';
+import GameBehaviour from '../lib/GameBehaviour';
 
 
 let TextureCache = utils.TextureCache;
+
+class  ScoreboardDisplay extends GameBehaviour
+{
+
+}
 
 export default class Scoreboard extends VFDGameObject
 {

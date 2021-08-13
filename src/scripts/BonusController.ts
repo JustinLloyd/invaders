@@ -1,8 +1,8 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
-import GameObject from "./GameObject";
+import GameObject from "../lib/GameObject";
 import Bonus from "./Bonus";
-import VFDGameObject from './VFDGameObject';
+import VFDGameObject from '../lib/VFDGameObject';
 
 export default class BonusController extends GameObject
 {

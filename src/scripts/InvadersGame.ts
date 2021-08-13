@@ -2,7 +2,7 @@
 
 import * as $ from "jquery";
 import * as PIXI from "pixi.js"
-import GameObject from "./GameObject";
+import GameObject from "../lib/GameObject";
 import Invader from "./Invader";
 import DifficultySetting from "./DifficultySetting";
 import DeathRay from "./DeathRay";
@@ -10,7 +10,7 @@ import Missile from "./Missile";
 import MissileBase from "./MissileBase";
 import Bonus from "./Bonus";
 import Scoreboard from "./Scoreboard";
-import LivesIndicator from "./LivesIndicator";
+import InvaderLivesIndicator from "./InvaderLivesIndicator";
 import Playfield from "./Playfield";
 import DebugInfo from "./DebugInfo";
 import {
@@ -29,9 +29,10 @@ import PlayfieldGameWorld from "./PlayfieldGameWorld";
 import InvaderSpawner from "./InvaderSpawner";
 import BonusController from "./BonusController";
 import MissileBaseController from "./PlayerController";
-import VFDGameObject from './VFDGameObject';
+import VFDGameObject from '../lib/VFDGameObject';
 import {Instructions} from './Instructions';
 import {InstructionsBackground} from './InstructionsBackground';
+import LivesIndicator from '../lib/LivesIndicator';
 
 let invader_01 = require('url:../assets/invader-01.png');
 let invader_02 = require('url:../assets/invader-02.png');
@@ -86,7 +87,7 @@ export class InvadersGame extends PlayfieldGameWorld
     instructions: Instructions;
     instructionsBackground: InstructionsBackground;
     scoreboard: Scoreboard;
-    livesIndicator: LivesIndicator;
+    livesIndicator: InvaderLivesIndicator;
     playfield: Playfield;
     invaderController: InvaderSpawner;
     gameState: GameState;
@@ -101,7 +102,7 @@ export class InvadersGame extends PlayfieldGameWorld
     public start()
     {
         this.missileBaseController.missileBase.onExitPlayfield.push((missileBase) => this.onPlayerKilled(missileBase));
-        this.livesIndicator.onOutOfLives.push((livesIndicator: LivesIndicator) => this.onOutOfLives(livesIndicator));
+        this.livesIndicator.onOutOfLives.push((livesIndicator: InvaderLivesIndicator) => this.onOutOfLives(livesIndicator));
         this.difficulty.onDifficultyChanged.push((difficultySetting: DifficultySetting, difficulty: number) => this.onDifficultyChanged(difficultySetting, difficulty));
         this.scoreboard.onPointsUpdated.push((scoreboard: Scoreboard, points: number) => this.onPointsUpdated(scoreboard, points));
         this.scoreboard.onMaximumPointsAchieved.push((scoreboard: Scoreboard, points: number) => this.onMaximumPoints(scoreboard, points));
@@ -214,7 +215,7 @@ export class InvadersGame extends PlayfieldGameWorld
         this.instructions = VFDGameObject.createGameObject(Instructions);
 
         // player lives setup
-        this.livesIndicator = VFDGameObject.createGameObject(LivesIndicator);
+        this.livesIndicator = VFDGameObject.createGameObject(InvaderLivesIndicator);
         this.livesIndicator.maximumLives = MAX_LIVES;
 
         // scoreboard setup

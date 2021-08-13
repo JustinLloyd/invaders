@@ -15,7 +15,7 @@ import {
 } from "./Constants";
 import DifficultySetting from "./DifficultySetting";
 import PlayfieldGameObject from "./PlayfieldGameObject";
-import GameObject from './GameObject';
+import GameObject from '../lib/GameObject';
 
 let TextureCache = utils.TextureCache;
 

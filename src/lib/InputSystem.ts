@@ -12,7 +12,7 @@ import {
     KEY_CODE_MOVE_LEFT,
     KEY_CODE_MOVE_RIGHT,
     KEY_CODE_RESET
-} from "./Constants";
+} from "../scripts/Constants";
 
 export default class InputSystem
 {

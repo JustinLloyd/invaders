@@ -1,6 +1,6 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
-import GameWorld from "./GameWorld";
+import GameWorld from "../lib/GameWorld";
 import PlayfieldGameObject from "./PlayfieldGameObject";
 
 export default abstract class PlayfieldGameWorld extends GameWorld

@@ -1,11 +1,11 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
 import {Sprite, utils} from "pixi.js";
-import GameObject from "./GameObject";
+import GameObject from "../lib/GameObject";
 import * as CONSTANTS from "./Constants";
 import {COLLISION_BONUS, COLLISION_MISSILE, LEFT_COLUMN, RIGHT_COLUMN, TEXTURE_BONUS_01, TEXTURE_BONUS_02, TEXTURE_BONUS_HIT_01, TEXTURE_BONUS_HIT_02} from "./Constants";
 import DifficultySetting from "./DifficultySetting";
-import Random from "./Random";
+import Random from "../lib/Random";
 import PlayfieldGameObject from "./PlayfieldGameObject";
 import {MovementDirection} from './Enums';
 

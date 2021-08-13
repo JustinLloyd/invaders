@@ -1,12 +1,12 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
-import GameObject from "./GameObject";
-import GameObjectPool from "./GameObjectPool";
+import GameObject from "../lib/GameObject";
+import GameObjectPool from "../lib/GameObjectPool";
 import DifficultySetting from "./DifficultySetting";
 import Invader from "./Invader";
-import Random from "./Random";
-import Interval from "./Interval";
-import VFDGameObject from './VFDGameObject';
+import Random from "../lib/Random";
+import Interval from "../lib/Interval";
+import VFDGameObject from '../lib/VFDGameObject';
 
 export default class InvaderSpawner extends GameObject
 {

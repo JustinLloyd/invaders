@@ -1,9 +1,9 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
-import GameObject from "./GameObject";
-import GameWorld from "./GameWorld";
+import GameObject from "../lib/GameObject";
+import GameWorld from "../lib/GameWorld";
 import MissileBase from "./MissileBase";
-import VFDGameObject from './VFDGameObject';
+import VFDGameObject from '../lib/VFDGameObject';
 
 
 export default class MissileBaseController extends GameObject

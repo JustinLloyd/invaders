@@ -1,6 +1,6 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
-import GameObject from "./GameObject";
+import GameObject from "../lib/GameObject";
 
 export default class DebugInfo extends GameObject
 {

@@ -6,7 +6,7 @@ import {gsap} from "gsap";
 import {PixiPlugin}  from "gsap/PixiPlugin";
 import GameObject from "./GameObject";
 import InputSystem from "./InputSystem";
-import {GAME_SCALE} from "./Constants";
+import {GAME_SCALE} from "../scripts/Constants";
 
 let loader = PIXI.Loader.shared;
 

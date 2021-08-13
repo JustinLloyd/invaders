@@ -12,7 +12,7 @@ import {
     TEXTURE_MISSILE,
     TOP_ROW
 } from "./Constants";
-import GameObject from "./GameObject";
+import GameObject from "../lib/GameObject";
 import DifficultySetting from "./DifficultySetting";
 import PlayfieldGameObject from "./PlayfieldGameObject";
 

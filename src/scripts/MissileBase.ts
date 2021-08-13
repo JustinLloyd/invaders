@@ -1,9 +1,9 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
 import {Sprite, utils} from "pixi.js";
-import GameObject from "./GameObject";
+import GameObject from "../lib/GameObject";
 import Missile from "./Missile";
-import GameObjectPool from "./GameObjectPool";
+import GameObjectPool from "../lib/GameObjectPool";
 import {
     CENTER_COLUMN,
     LEFT_COLUMN,
@@ -18,11 +18,11 @@ import {
     TEXTURE_MISSILE_BASE, MISSILE_BASE_COL_OFFSET, MISSILE_BASE_HIT_X_OFFSET, MISSILE_BASE_HIT_Y_OFFSET
 } from "./Constants";
 import DifficultySetting from "./DifficultySetting";
-import Clamp from "./Clamp";
-import Interval from "./Interval";
+import Clamp from "../lib/Clamp";
+import Interval from "../lib/Interval";
 import PlayfieldGameObject from "./PlayfieldGameObject";
 import DeathRay from './DeathRay';
-import VFDGameObject from './VFDGameObject';
+import VFDGameObject from '../lib/VFDGameObject';
 
 let TextureCache = utils.TextureCache;
 
