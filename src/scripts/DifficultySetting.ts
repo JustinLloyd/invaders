@@ -17,6 +17,7 @@ import Clamp from "../lib/Clamp";
 import VFDGameObject from '../lib/VFDGameObject';
 import {Sprite, utils} from 'pixi.js';
 import Validation from '../lib/Validation';
+import GameWorld from '../lib/GameWorld';
 
 
 let TextureCache = utils.TextureCache;
@@ -150,6 +151,7 @@ export default class DifficultySetting extends VFDGameObject
             callback(this, this._currentDifficulty);
         }
 
+        GameWorld.instance.events.emit('difficulty-changed', this);
     }
 
     private changeTexturesForDifficulty(difficulty: number)
