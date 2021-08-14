@@ -4,6 +4,7 @@ import {BOTTOM_ROW, DEFAULT_DEATH_DELAY, DEFAULT_MOVEMENT_DELAY, LEFT_COLUMN, RI
 import Interval from "../lib/Interval";
 import Validation from "../lib/Validation";
 import VFDGameObject from "../lib/VFDGameObject";
+import GameWorld from '../lib/GameWorld';
 
 export default class PlayfieldGameObject extends VFDGameObject
 {
@@ -299,6 +300,7 @@ export default class PlayfieldGameObject extends VFDGameObject
             callback(this);
         }
 
+        GameWorld.instance.events.emit('dead', this);
     }
 
     protected dispatchOnExitPlayfield()
@@ -308,6 +310,7 @@ export default class PlayfieldGameObject extends VFDGameObject
             callback(this);
         }
 
+        GameWorld.instance.events.emit('exit-playfield', this);
     }
 
     protected dispatchOnEnterPlayfield()
@@ -317,6 +320,7 @@ export default class PlayfieldGameObject extends VFDGameObject
             callback(this);
         }
 
+        GameWorld.instance.events.emit('enter-playfield', this);
     }
 
     protected dispatchOnMove()
@@ -326,6 +330,7 @@ export default class PlayfieldGameObject extends VFDGameObject
             callback(this);
         }
 
+        GameWorld.instance.events.emit('moved', this);
     }
 
     public die()

@@ -1,6 +1,7 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
 import Behaviour from "./Behaviour";
+import GameWorld from './GameWorld';
 
 export default class GameBehaviour extends Behaviour
 {
@@ -87,6 +88,7 @@ export default class GameBehaviour extends Behaviour
             callback(this);
         }
 
+        GameWorld.instance.events.emit('enabled', this);
     }
 
     protected dispatchOnDisabled()
@@ -96,6 +98,7 @@ export default class GameBehaviour extends Behaviour
             callback(this);
         }
 
+        GameWorld.instance.events.emit('disabled', this);
     }
 
     public destroy()

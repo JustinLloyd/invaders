@@ -23,6 +23,7 @@ import Interval from "../lib/Interval";
 import PlayfieldGameObject from "./PlayfieldGameObject";
 import DeathRay from './DeathRay';
 import VFDGameObject from '../lib/VFDGameObject';
+import GameWorld from '../lib/GameWorld';
 
 let TextureCache = utils.TextureCache;
 
@@ -95,6 +96,7 @@ export default class MissileBase extends PlayfieldGameObject
     {
         super.die();
         this._isArmed = false;
+        GameWorld.instance.events.emit('player-killed', this);
     }
 
     public showNormal()

@@ -3,6 +3,7 @@
 import {utils} from 'pixi.js';
 import VFDGameObject from "./VFDGameObject";
 import Validation from "./Validation";
+import GameWorld from './GameWorld';
 
 export default class LivesIndicator extends VFDGameObject
 {
@@ -69,6 +70,7 @@ export default class LivesIndicator extends VFDGameObject
         {
             callback(this, this._lives);
         }
+        GameWorld.instance.events.emit('life-deducted', this);
     }
 
     public dispatchOnLifeAdded()
@@ -77,6 +79,8 @@ export default class LivesIndicator extends VFDGameObject
         {
             callback(this, this._lives);
         }
+
+        GameWorld.instance.events.emit('life-added', this);
     }
 
     public dispatchOnLivesUpdated()
@@ -85,6 +89,8 @@ export default class LivesIndicator extends VFDGameObject
         {
             callback(this, this._lives);
         }
+
+        GameWorld.instance.events.emit('lives-updated', this);
     }
 
 
@@ -94,6 +100,8 @@ export default class LivesIndicator extends VFDGameObject
         {
             callback(this);
         }
+
+        GameWorld.instance.events.emit('maximum-lives-achieved', this);
     }
 
     public dispatchOnOutOfLives()
@@ -102,6 +110,8 @@ export default class LivesIndicator extends VFDGameObject
         {
             callback(this);
         }
+
+        GameWorld.instance.events.emit('out-of-lives', this);
     }
 
     public get lives(): number

@@ -9,6 +9,7 @@ import VFDGameObject from "../lib/VFDGameObject";
 import Validation from "../lib/Validation";
 import DifficultySetting from './DifficultySetting';
 import GameBehaviour from '../lib/GameBehaviour';
+import GameWorld from '../lib/GameWorld';
 
 
 let TextureCache = utils.TextureCache;
@@ -128,6 +129,8 @@ export default class Scoreboard extends VFDGameObject
         {
             callback(this, points);
         }
+
+        GameWorld.instance.events.emit('points-updated', this);
     }
 
     private dispatchOnMaximumPointsAchieved(points: number)
@@ -136,6 +139,8 @@ export default class Scoreboard extends VFDGameObject
         {
             callback(this, points);
         }
+
+        GameWorld.instance.events.emit('maximum-points-achieved', this);
     }
 
     public dispatchOnMaximumPointsUpdated()
@@ -144,6 +149,8 @@ export default class Scoreboard extends VFDGameObject
         {
             callback(this, this._maximumPoints);
         }
+
+        GameWorld.instance.events.emit('maximum-points-updated', this);
     }
 }
 

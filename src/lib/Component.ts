@@ -1,5 +1,7 @@
 // (c) Copyright 2021 Justin Lloyd. All rights reserved.
 
+import GameWorld from './GameWorld';
+
 export default class Component
 {
     public onDestroyed: Array<(component: Component) => void> = new Array<(component: Component) => void>();
@@ -42,6 +44,7 @@ export default class Component
             callback(this);
         }
 
+        GameWorld.instance.events.emit('destroyed', this);
     }
 
 
