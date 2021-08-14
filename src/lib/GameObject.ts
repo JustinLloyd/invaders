@@ -203,6 +203,7 @@ export default class GameObject
             callback(this);
         }
 
+        GameWorld.instance.events.emit('show', this);
     }
 
     protected dispatchOnHide()
@@ -213,6 +214,7 @@ export default class GameObject
             callback(this);
         }
 
+        GameWorld.instance.events.emit('hide', this);
     }
 
     protected dispatchOnEnabled()
@@ -223,6 +225,7 @@ export default class GameObject
             callback(this);
         }
 
+        GameWorld.instance.events.emit('enabled', this);
     }
 
     protected dispatchOnDisabled()
@@ -233,6 +236,7 @@ export default class GameObject
             callback(this);
         }
 
+        GameWorld.instance.events.emit('disabled', this);
     }
 
     public onDestroy()
@@ -248,6 +252,7 @@ export default class GameObject
             callback(this);
         }
 
+        GameWorld.instance.events.emit('destroyed', this);
     }
 
     private onShow()
