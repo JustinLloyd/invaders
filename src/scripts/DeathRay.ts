@@ -31,8 +31,8 @@ export default class DeathRay extends PlayfieldGameObject
         this.colOffset = DEATH_RAY_COL_OFFSET;
         this.colStep = DEATH_RAY_COL_STEP;
         this.isLockedToPlayfield = false;
-        this.maxRow=BOTTOM_ROW;
-        this.deathRayTextureNames = [null, TEXTURE_DEATH_RAY_02,TEXTURE_DEATH_RAY_01, TEXTURE_DEATH_RAY_02, TEXTURE_DEATH_RAY_01, TEXTURE_DEATH_RAY_02,null];
+        this.maxRow = BOTTOM_ROW;
+        this.deathRayTextureNames = [null, TEXTURE_DEATH_RAY_02, TEXTURE_DEATH_RAY_01, TEXTURE_DEATH_RAY_02, TEXTURE_DEATH_RAY_01, TEXTURE_DEATH_RAY_02, null];
         this.deathRaySprite = new Sprite(TextureCache[this.deathRayTextureNames[0]]);
         this.deathRaySprite.anchor.set(0.5, 0.5);
         this.container.addChild(this.deathRaySprite);
@@ -53,7 +53,7 @@ export default class DeathRay extends PlayfieldGameObject
             return;
         }
 
-        this.changeTexturesForRow(newRow)
+        this.changeTexturesForRow(newRow);
     }
 
     public fire(col: number, row: number)
@@ -101,9 +101,11 @@ export default class DeathRay extends PlayfieldGameObject
     {
         if ((newRow < INVADER_HIGHEST_ROW) || (newRow >= BOTTOM_ROW))
         {
+            this.deathRaySprite.visible = false;
             return;
         }
 
+        this.deathRaySprite.visible = true;
         this.deathRaySprite.texture = TextureCache[this.deathRayTextureNames[newRow]];
     }
 
