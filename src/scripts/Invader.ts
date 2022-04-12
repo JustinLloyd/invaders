@@ -35,6 +35,7 @@ import InvaderSpawner from './InvaderSpawner';
 import Missile from './Missile';
 import {MovementDirection} from './Enums';
 import VFDGameObject from '../lib/VFDGameObject';
+import GameWorld from '../lib/GameWorld';
 
 let TextureCache = utils.TextureCache;
 
@@ -268,6 +269,8 @@ export default class Invader extends PlayfieldGameObject
         {
             callback(this);
         }
+
+        GameWorld.instance.events.emit('landed', this);
     }
 
     public showNormal()

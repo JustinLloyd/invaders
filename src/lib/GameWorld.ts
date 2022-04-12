@@ -7,7 +7,7 @@ import {PixiPlugin}  from "gsap/PixiPlugin";
 import GameObject from "./GameObject";
 import InputSystem from "./InputSystem";
 import {GAME_SCALE} from "../scripts/Constants";
-import {EventEmitter} from 'eventemitter3';
+import {EventEmitter, EventEmitterStatic} from 'eventemitter3';
 
 let loader = PIXI.Loader.shared;
 
