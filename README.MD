@@ -1,4 +1,4 @@
-# InvadersGame - Space Invaders Game 🚀
+# Invader's Game - Space Invaders Game 🚀
 
 This repository contains a space invaders game I created as a fun side project and portfolio piece. The game is built with TypeScript, CSS, and HTML, and uses the PIXI.js framework for displaying graphics. The aesthetic is reminiscent of a 1980's handheld video game with Vacuum Fluorescent Display (VFD) technology.
 
