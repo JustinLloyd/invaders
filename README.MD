@@ -6,7 +6,7 @@ Check out a live demo of the game on my website: [justin-lloyd.com](https://www.
 
 ## Game Screenshot 📸
 
-![Game Screenshot](image_link_here)
+![Game Screenshot](screenshot-01.jpg)
 
 ## Features 🎮
 
